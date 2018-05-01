@@ -242,16 +242,9 @@ public class Level {
         return Collections.unmodifiableList(this.triggers);
     }
 
-    public void addPlayer(Vector2D location, Player.Type type) {
-        if (isPointValid(location)) {
-            Player spawnPlayer = new Player(this, type);
-            players.add(spawnPlayer);
-            spawnGameObject(spawnPlayer, location);
-        }
-    }
-
     public void processInput(Vector2D.Direction moveDirection) {
         List<Player> failures = new ArrayList<>();
+        List<Player> pullers = new ArrayList<>();
         for (Player player : players) {
             if (!player.move(moveDirection)) {
                 failures.add(player);
@@ -259,8 +252,18 @@ public class Level {
         }
 
         for (Player failure : failures) {
-            failure.move(moveDirection);
+            if (!failure.move(moveDirection) && failure.getType() == Player.Type.PULL) {
+                pullers.add(failure);
+            }
         }
+
+        for (Player puller : pullers) {
+            moveObject(puller, moveDirection);
+        }
+
+
+
+
     }
 
 

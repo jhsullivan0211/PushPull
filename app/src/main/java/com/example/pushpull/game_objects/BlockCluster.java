@@ -19,7 +19,7 @@ package com.example.pushpull.game_objects;
 public class BlockCluster implements GameObject{
 
 
-    private int color = Color.MAGENTA;
+    private int color = Color.rgb(50,205,50);
     private Vector2D location;
     private Level level;
     private List<BlockCluster> clusters = new ArrayList<>();

@@ -75,13 +75,7 @@ public class Player implements GameObject{
                 Vector2D pullPoint = location.getPointInDirection(opposite);
                 other = level.getObjectAt(pullPoint);
                 addIfValid(other, movers);
-
-                if (level.moveGroup(movers, direction)) {
-                    return true;
-                }
-                else {
-                    return level.moveObject(this, direction);
-                }
+                return level.moveGroup(movers, direction);
 
             case GRABALL:
                 movers.addAll(level.getAllAttached(this));

@@ -12,7 +12,7 @@ public class Target extends Trigger {
 
     public Target(Vector2D location, Level level) {
         super(location, level);
-        this.color = Color.WHITE;
+        this.color = Color.rgb(255,20,147);
         filled = level.isPositionFilled(location);
     }
 

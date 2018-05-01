@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         levelView = findViewById(R.id.levelView);
         levelManager = new LevelManager(this);
         levelView.setLevel(levelManager.getCurrentLevel());

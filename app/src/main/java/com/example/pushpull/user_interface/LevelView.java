@@ -1,10 +1,10 @@
 package com.example.pushpull.user_interface;
 
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -13,12 +13,9 @@ import android.view.View;
 
 import com.example.pushpull.game_logic.Level;
 import com.example.pushpull.game_logic.LevelManager;
-import com.example.pushpull.game_objects.BlockCluster;
 import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.game_objects.Wall;
 import com.example.pushpull.myLibrary.Vector2D;
 import com.example.pushpull.triggers.Trigger;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,11 +35,13 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
     private int margin;
     private int width;
 
+    private final int borderWidth = 5;
+    private final int circleOffset = 3;
+
 
 
     private final int VELOCITY_THRESHOLD = 200;
     private final int DISTANCE_THRESHOLD = 10;
-
     private int gridLength;
 
     private GestureDetectorCompat gestureDetector;
@@ -91,20 +90,34 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
     }
 
 
+
+
     @Override
     public boolean performClick() {
-        return false;
+        return super.performClick();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
 
 
-        canvas.drawColor(Color.CYAN);
+        int size = Math.min(canvas.getWidth(), canvas.getHeight());
+        margin = size / 100;
+        width = ((size - margin) / 10);
+
+
+
+        this.setMeasuredDimension(size, size);
+
 
         if (level == null) {
             return;
         }
+        paint.setColor(Color.CYAN);
+        canvas.drawRect(0, 0, size, size, paint);
+
+
+
 
         for (Trigger trigger : level.getTriggers()) {
             drawFill(canvas, trigger.getLocation(), trigger.getColor(), Shape.CIRCLE);
@@ -124,11 +137,6 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
 
     public void drawFill(Canvas canvas, Vector2D location, int color, Shape shape) {
 
-        margin = canvas.getWidth() / 100;
-        width = ((canvas.getWidth()- margin) / 10);
-
-
-
         int x = location.getX() * width + margin;
         int y = location.getY() * width + margin;
 
@@ -140,13 +148,12 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
             canvas.drawRect(x, y, x + width, y + width, paint);
             paint.setColor(Color.BLACK);
 
-
-
         }
 
         if (shape == Shape.CIRCLE) {
             paint.setColor(color);
-            canvas.drawCircle(x + width / 2, y + width / 2, width / 2, paint);
+            canvas.drawCircle(x + width / 2, y + width / 2,
+                            width / 2 - circleOffset, paint);
         }
     }
 
@@ -155,18 +162,11 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
 
 
         paint.setColor(Color.BLACK);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(borderWidth);
 
         for (GameObject obj : group) {
             int x = obj.getLocation().getX() * width + margin;
             int y = obj.getLocation().getY() * width + margin;
-
-
-
-
-
-
-
 
             if (level.getObjectBorders(obj) != null)  {
                 for (Vector2D.Direction direction : level.getObjectBorders(obj)) {
