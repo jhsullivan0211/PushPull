@@ -1,6 +1,7 @@
 package com.example.pushpull.myLibrary;
 
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Random;
 
 
 
-public class Vector2D {
+public class Vector2D implements Serializable{
 
     public enum Direction {LEFT, RIGHT, UP, DOWN};
 

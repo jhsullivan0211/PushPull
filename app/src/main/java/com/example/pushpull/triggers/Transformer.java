@@ -32,6 +32,10 @@ public class Transformer extends Trigger{
 
     }
 
+    public Player.Type getType() {
+        return type;
+    }
+
     @Override
     public void act(GameObject filler) {
         if (!filled && filler instanceof Player) {

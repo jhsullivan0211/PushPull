@@ -21,16 +21,12 @@ public class BlockCluster implements GameObject{
 
     private int color = Color.rgb(50,205,50);
     private Vector2D location;
-    private Level level;
     private List<BlockCluster> clusters = new ArrayList<>();
     private boolean move = true;
-    private String clusterID;
+    private Character clusterID;
 
-    public BlockCluster(Level level, String clusterID) {
-        this.level = level;
+    public BlockCluster(Character clusterID) {
         this.clusterID = clusterID;
-
-
     }
 
     public void makeCluster(List<BlockCluster> template) {
@@ -70,7 +66,7 @@ public class BlockCluster implements GameObject{
         return move;
     }
 
-    public String getClusterID() {
+    public Character getClusterID() {
         return clusterID;
     }
 

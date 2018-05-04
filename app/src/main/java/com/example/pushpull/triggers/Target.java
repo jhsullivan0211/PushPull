@@ -18,7 +18,7 @@ public class Target extends Trigger {
 
     @Override
     public void act(GameObject filler) {
-
+        filled = level.isPositionFilled(location);
     }
 
     @Override

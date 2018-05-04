@@ -17,7 +17,7 @@ public class Player implements GameObject{
     public enum Type {PUSH, PULL, GRABALL};
 
     private Level level;
-    private Type type;;
+    private Type type;
     private int color;
     private Vector2D location;
 
@@ -78,13 +78,49 @@ public class Player implements GameObject{
                 return level.moveGroup(movers, direction);
 
             case GRABALL:
-                movers.addAll(level.getAllAttached(this));
+                movers.addAll(getAllAttached(this));
                 return level.moveGroup(movers, direction);
         }
 
         throw new IllegalArgumentException("Player type is unknown.");
     }
 
+    public Collection<GameObject> getAllAttached(GameObject target) {
+
+        Set<GameObject> attached = new HashSet<>();
+        Set<GameObject> next = new HashSet<>();
+        Set<GameObject> frontier = new HashSet<>();
+        next.add(target);
+
+        do {
+            for (GameObject obj : next) {
+                attached.add(obj);
+                for (GameObject adj : level.getAdjacentObjects(obj)) {
+                    if (!attached.contains(adj) && !(adj instanceof Wall) && adj.canMove()) {
+                        frontier.add(adj);
+                    }
+                }
+            }
+            next = frontier;
+            frontier = new HashSet<>();
+        } while (next.size() > 0);
+
+        return attached;
+    }
+
+
+    public static Type idToType(Character id) {
+        if (id == 'p' || id == 'P') {
+            return Type.PUSH;
+        }
+        if (id == 'q' || id == 'Q') {
+            return Type.PULL;
+        }
+        if (id == 'r' || id == 'R') {
+            return Type.GRABALL;
+        }
+        return null;
+    }
 
 
 

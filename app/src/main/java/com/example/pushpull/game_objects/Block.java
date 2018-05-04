@@ -10,11 +10,10 @@ public class Block implements GameObject{
 
     private int color = Color.LTGRAY;
     private Vector2D location;
-    private Level level;
     private boolean move = true;
 
-    public Block(Level level) {
-        this.level = level;
+    public Block() {
+
     }
 
     @Override

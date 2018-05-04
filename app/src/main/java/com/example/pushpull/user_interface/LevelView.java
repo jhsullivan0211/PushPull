@@ -34,14 +34,14 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
 
     private int margin;
     private int width;
+    private int size;
 
     private final int borderWidth = 5;
     private final int circleOffset = 3;
 
 
-
-    private final int VELOCITY_THRESHOLD = 200;
-    private final int DISTANCE_THRESHOLD = 10;
+    private static final int VELOCITY_THRESHOLD = 200;
+    private static final int DISTANCE_THRESHOLD = 10;
     private int gridLength;
 
     private GestureDetectorCompat gestureDetector;
@@ -77,6 +77,8 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
             }
         });
         gestureDetector = new GestureDetectorCompat(context, this);
+
+
     }
 
     public void setLevel(Level level) {
@@ -100,11 +102,9 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
     @Override
     public void onDraw(Canvas canvas) {
 
-
-        int size = Math.min(canvas.getWidth(), canvas.getHeight());
+        size = Math.min(this.getWidth(), this.getHeight());
         margin = size / 100;
         width = ((size - margin) / 10);
-
 
 
         this.setMeasuredDimension(size, size);
@@ -130,15 +130,20 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
 
         }
 
+    }
 
-
-
+    public Vector2D getScreenVector(Vector2D inputVector) {
+        int x = inputVector.getX() * width + margin;
+        int y = inputVector.getY() * width + margin;
+        return new Vector2D(x, y);
     }
 
     public void drawFill(Canvas canvas, Vector2D location, int color, Shape shape) {
 
-        int x = location.getX() * width + margin;
-        int y = location.getY() * width + margin;
+        Vector2D screenLocation = getScreenVector(location);
+        int x = screenLocation.getX();
+        int y = screenLocation.getY();
+
 
 
         if (shape == Shape.SQUARE) {
@@ -157,6 +162,8 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
         }
     }
 
+
+
     public void drawBorders(Canvas canvas, Collection<GameObject> group) {
 
 
@@ -165,8 +172,10 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
         paint.setStrokeWidth(borderWidth);
 
         for (GameObject obj : group) {
-            int x = obj.getLocation().getX() * width + margin;
-            int y = obj.getLocation().getY() * width + margin;
+
+            Vector2D screenLocation = getScreenVector(obj.getLocation());
+            int x = screenLocation.getX();
+            int y = screenLocation.getY();
 
             if (level.getObjectBorders(obj) != null)  {
                 for (Vector2D.Direction direction : level.getObjectBorders(obj)) {
@@ -246,7 +255,6 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
             }
             if (direction != null) {
                 applyMovement(direction);
-                level.update();
             }
         }
         return true;
@@ -254,7 +262,7 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
 
     private void applyMovement(Vector2D.Direction direction) {
         level.processInput(direction);
-        level.update();
+
         if (levelManager.checkVictory()) {
             setLevel(levelManager.getCurrentLevel());
         }

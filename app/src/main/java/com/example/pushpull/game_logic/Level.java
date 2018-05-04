@@ -2,6 +2,8 @@ package com.example.pushpull.game_logic;
 
 
 
+    import android.os.Build;
+
     import com.example.pushpull.game_objects.Block;
     import com.example.pushpull.game_objects.BlockCluster;
     import com.example.pushpull.game_objects.GameObject;
@@ -16,10 +18,9 @@ package com.example.pushpull.game_logic;
     import java.util.Collections;
     import java.util.Comparator;
     import java.util.HashMap;
-    import java.util.HashSet;
     import java.util.List;
     import java.util.Map;
-    import java.util.Set;
+
 
 
 
@@ -34,46 +35,43 @@ public class Level {
 
     private Vector2D levelBounds = new Vector2D(columnNumber - 1, rowNumber - 1);
 
-    private String[][] levelLayout = new String[rowNumber][columnNumber];
-
+    private String layout;
 
     private List<GameObject> gameObjects = new ArrayList<>();
     private Map<Vector2D, GameObject> filledPositions = new HashMap<>();
+    private Map<Vector2D, GameObject> gameState = new HashMap<>();
+    private Map<Vector2D, String> serializeableGameState = new HashMap<>();
     private List<Player> players = new ArrayList<>();
     private List<Trigger> triggers = new ArrayList<>();
     private List<Target> targets = new ArrayList<>();
-    private List<Wall> walls = new ArrayList<>();
 
     private Map<String, List<BlockCluster>> clusterGroups = new HashMap<>();
-
     private Map<GameObject, List<Vector2D.Direction>> borderMap = new HashMap<>();
-
 
     private boolean isComplete = false;
 
-
-
-    public Level(String[][] layout) {
-        this.levelLayout = layout;
+    public Level(String layout) {
+        this.layout = layout;
         this.load(layout);
         update();
     }
 
 
-
-    private void load(String[][] levelLayout) {
+    private void load(String layout) {
         this.gameObjects.clear();
 
-        if (levelLayout.length != rowNumber || levelLayout[0].length != columnNumber) {
-            throw new IllegalArgumentException("Level dimensions are invalid.");
-        }
 
-        for (int i = 0; i < rowNumber; i += 1) {
-            for (int j = 0; j < columnNumber; j += 1) {
-                String id = levelLayout[i][j];
-                Vector2D spawnPoint = new Vector2D(j, i);
-                processID(id, spawnPoint);
-            }
+       int position = 0;
+
+
+       for (char id : layout.toCharArray()) {
+           if (id == ','|| id == '\n') {
+               continue;
+           }
+           int y = position / 10;
+           int x = position % 10;
+           processID(id, new Vector2D(x, y));
+           position += 1;
         }
 
         for (List<BlockCluster> clusterList : clusterGroups.values()) {
@@ -82,30 +80,36 @@ public class Level {
             }
         }
 
+        gameState = new HashMap<>(filledPositions);
         sortPlayers();
-
     }
 
 
-    private void processID(String id, Vector2D location) {
-        //TODO: tidy this up
-        if (id.equals("x")) {
-            return;
+
+    private void processID(Character idChar, Vector2D location) {
+        //TODO: find a better way for this
+
+        String id = Character.toString(idChar);
+        if (id.equals("b")) {
+            spawnGameObject(new Block(), location);
         }
 
-
-        else if (id.equals("b")) {
-            spawnGameObject(new Block(this), location);
-        }
         else if (id.equals("h")) {
-            processID("b", location);
-            processID("o", location);
+            processID('b', location);
+            processID('o', location);
+        }
+
+        else if (id.matches("[def]")) {
+            int converter = 'p' - 'd';
+            Character converted = (char) (idChar + converter);
+            processID('o', location);
+            processID(converted, location);
+
         }
 
         else if (id.equals("w")) {
             Wall spawnWall = new Wall();
             spawnGameObject(spawnWall, location);
-            walls.add(spawnWall);
         }
         else if (id.equals("o")) {
             Target target = new Target(location, this);
@@ -113,18 +117,15 @@ public class Level {
             targets.add(target);
 
         }
-        else if (id.equals("q")) {
-            triggers.add(new Transformer(Player.Type.PUSH, location, this));
-        }
-        else if (id.equals("r")) {
-            triggers.add(new Transformer(Player.Type.PULL, location, this));
-        }
-        else if (id.equals("s")) {
-            triggers.add(new Transformer(Player.Type.GRABALL, location, this));
-        }
-        else if (id.matches("\\d+")) {
 
-            BlockCluster spawned = new BlockCluster(this, id);
+        else if (id.matches("[PQR]")) {
+            triggers.add(new Transformer(Player.idToType(idChar), location, this));
+        }
+
+        else if (id.matches("[\\d%^]")) {
+
+
+            BlockCluster spawned = new BlockCluster(idChar);
             spawnGameObject(spawned, location);
 
             if (!clusterGroups.containsKey(id)) {
@@ -133,28 +134,38 @@ public class Level {
             clusterGroups.get(id).add(spawned);
         }
 
-        else if (id.matches("[p@#]")) {
-            Player.Type spawnType;
-            if (id.equals("p")) {
-                spawnType = Player.Type.PUSH;
-            }
-            else if (id.equals("@")) {
-                spawnType = Player.Type.PULL;
-            }
-            else {
-                spawnType = Player.Type.GRABALL;
-            }
+        else if (id.matches("[A-J]")) {
+            int charVal = (int) idChar;
+            charVal = charVal % (int) 'A';
+            processID('o', location);
+            processID(Character.forDigit(charVal, 10), location);
+        }
+
+        else if (id.matches("[pqr]")) {
+            Player.Type spawnType = Player.idToType(idChar);
             Player spawnPlayer = new Player(this, spawnType);
             spawnGameObject(spawnPlayer, location);
             players.add(spawnPlayer);
         }
 
-        else {
+        else if (!id.equals("x")){
             throw new RuntimeException("Object ID '" +  "" + id +  "' does not correspond to a known object.");
         }
     }
 
+    public void revertState() {
+        for (Vector2D position : gameState.keySet()) {
+            gameState.get(position).setLocation(position);
+        }
+        this.filledPositions = gameState;
+        update();
+    }
 
+    public void clearGameObjects() {
+        gameObjects.clear();
+        filledPositions.clear();
+        players.clear();
+    }
 
     public void spawnGameObject(GameObject gameObject, Vector2D spawnPoint) {
         gameObject.setLocation(spawnPoint);
@@ -179,34 +190,55 @@ public class Level {
         return this.clusterGroups.values();
     }
 
-    public Collection<GameObject> getAllAttached(GameObject target) {
+    public HashMap<Vector2D, Character> getSerialState() {
+        HashMap<Vector2D, Character> serialState = new HashMap<>();
+        for (Vector2D point : filledPositions.keySet()) {
+            GameObject obj = filledPositions.get(point);
 
-        Set<GameObject> attached = new HashSet<>();
-        Set<GameObject> next = new HashSet<>();
-        Set<GameObject> frontier = new HashSet<>();
-        next.add(target);
+            if (obj instanceof Player) {
+                Player objPlayer = (Player) obj;
+                switch (objPlayer.getType()) {
+                    case PUSH:
+                        serialState.put(point, 'p');
+                        break;
+                    case PULL:
+                        serialState.put(point, 'q');
+                        break;
+                    case GRABALL:
+                        serialState.put(point, 'r');
 
-        do {
-            for (GameObject obj : next) {
-                attached.add(obj);
-                for (GameObject adj : getAdjacentObjects(obj)) {
-                    if (!attached.contains(adj) && !(adj instanceof Wall)) {
-                        frontier.add(adj);
-                    }
                 }
             }
 
-            next = frontier;
-            frontier = new HashSet<>();
-        } while (next.size() > 0);
+            if (obj instanceof Block) {
+                serialState.put(point, 'b');
+            }
 
+            if (obj instanceof BlockCluster) {
+                BlockCluster bc = (BlockCluster) obj;
+                serialState.put(point, bc.getClusterID());
+            }
 
+            if (obj instanceof Wall) {
+                serialState.put(point, 'w');
+            }
 
-        return attached;
+        }
+        return serialState;
     }
 
+    public void inflateSerialState(Map<Vector2D, Character> serialState) {
+        clearGameObjects();
+        for (Vector2D point : serialState.keySet()) {
+           processID(serialState.get(point), point);
+        }
 
+        update();
+    }
 
+    public void getNewObjectFromID(String id) {
+
+    }
 
     public void sortPlayers() {
         Collections.sort(players, new Comparator<Player>() {
@@ -243,28 +275,60 @@ public class Level {
     }
 
     public void processInput(Vector2D.Direction moveDirection) {
+        //TODO: fix this up
+        gameState = new HashMap<>(filledPositions);
+
         List<Player> failures = new ArrayList<>();
-        List<Player> pullers = new ArrayList<>();
-        for (Player player : players) {
-            if (!player.move(moveDirection)) {
-                failures.add(player);
+        int count = players.size();
+        while (failures.size() != count) {
+            count = failures.size();
+            failures = new ArrayList<>();
+            for (Player player : players) {
+                if (player.getType() == Player.Type.GRABALL) {
+                    if (!player.move(moveDirection)) {
+                        failures.add(player);
+                    }
+                }
+
+            }
+
+            for (Player player : players) {
+                if (player.getType() != Player.Type.GRABALL) {
+                    if (!player.move(moveDirection)) {
+                        failures.add(player);
+                    }
+                }
             }
         }
 
-        for (Player failure : failures) {
-            if (!failure.move(moveDirection) && failure.getType() == Player.Type.PULL) {
-                pullers.add(failure);
+        count = 1;
+        while (count > 0) {
+            count = 0;
+            for (Player player : players) {
+                if (player.canMove() && player.getType() == Player.Type.PULL) {
+                    if (!player.move(moveDirection)) {
+                        if (moveObject(player, moveDirection)) {
+                            count += 1;
+                        }
+                    }
+                    else {
+                        count += 1;
+                    }
+                }
             }
         }
 
-        for (Player puller : pullers) {
-            moveObject(puller, moveDirection);
-        }
 
 
+
+        update();
 
 
     }
+
+
+
+
 
 
     public boolean moveObject(GameObject object, Vector2D.Direction direction) {
@@ -305,7 +369,7 @@ public class Level {
     }
 
 
-    public void update() {
+    private void update() {
         for (Trigger trigger : triggers) {
             GameObject filler = filledPositions.get(trigger.getLocation());
             if (trigger.isFilled()) {
@@ -331,7 +395,6 @@ public class Level {
         if (targetCount == targets.size()) {
             isComplete = true;
         }
-
 
         sortPlayers();
 
@@ -417,17 +480,15 @@ public class Level {
         return isComplete;
     }
 
-    public String[][] getLayout() {
-        return this.levelLayout;
+    public String getLayout() {
+        return this.layout;
     }
 
     public int getGridLength() {
         return columnNumber;
     }
 
-    public Collection<Wall> getWalls() {
-        return this.walls;
-    }
+
 
 
 }
