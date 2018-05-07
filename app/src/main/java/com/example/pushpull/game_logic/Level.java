@@ -62,16 +62,21 @@ public class Level {
 
 
        int position = 0;
-
+       boolean doShift = false;
 
        for (char id : layout.toCharArray()) {
-           if (id == ','|| id == '\n') {
+           if (id == ','|| id == '\n' || id == ' ') {
                continue;
            }
-           int y = position / 10;
-           int x = position % 10;
+           int y = position / rowNumber;
+           int x = position % columnNumber;
            processID(id, new Vector2D(x, y));
-           position += 1;
+           if (doShift) {
+               position += 1;
+           }
+
+           doShift = !doShift;
+
         }
 
         for (List<BlockCluster> clusterList : clusterGroups.values()) {
@@ -94,19 +99,6 @@ public class Level {
             spawnGameObject(new Block(), location);
         }
 
-        else if (id.equals("h")) {
-            processID('b', location);
-            processID('o', location);
-        }
-
-        else if (id.matches("[def]")) {
-            int converter = 'p' - 'd';
-            Character converted = (char) (idChar + converter);
-            processID('o', location);
-            processID(converted, location);
-
-        }
-
         else if (id.equals("w")) {
             Wall spawnWall = new Wall();
             spawnGameObject(spawnWall, location);
@@ -115,15 +107,13 @@ public class Level {
             Target target = new Target(location, this);
             triggers.add(target);
             targets.add(target);
-
         }
 
         else if (id.matches("[PQR]")) {
             triggers.add(new Transformer(Player.idToType(idChar), location, this));
         }
 
-        else if (id.matches("[\\d%^]")) {
-
+        else if (id.matches("[\\d!@#$%^&*]")) {
 
             BlockCluster spawned = new BlockCluster(idChar);
             spawnGameObject(spawned, location);
@@ -132,13 +122,6 @@ public class Level {
                 clusterGroups.put(id, new ArrayList<BlockCluster>());
             }
             clusterGroups.get(id).add(spawned);
-        }
-
-        else if (id.matches("[A-J]")) {
-            int charVal = (int) idChar;
-            charVal = charVal % (int) 'A';
-            processID('o', location);
-            processID(Character.forDigit(charVal, 10), location);
         }
 
         else if (id.matches("[pqr]")) {

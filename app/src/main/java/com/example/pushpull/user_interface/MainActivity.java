@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     LevelView levelView;
     LevelManager levelManager;
 
-    private static final String levelNumberID = "PUSHPULL.LEVELNUMBER";
+    public static final String currentLevelID = "PUSHPULL.CURRENTLEVEL";
     private static final String gameStateID = "PUSHPULL.GAMESTATE";
     public static final String levelCountID = "PUSHPULL.LEVEL_COUNT";
 
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         levelManager = new LevelManager(this);
 
         if (savedInstanceState != null) {
-           int levelIndex = savedInstanceState.getInt(levelNumberID);
+           int levelIndex = savedInstanceState.getInt(currentLevelID);
             HashMap<Vector2D, Character> gameState = (HashMap)
                             savedInstanceState.getSerializable(gameStateID);
 
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putSerializable(gameStateID, levelManager.getGameStateSerial());
-        savedInstanceState.putInt(levelNumberID, levelManager.getLevelIndex());
+        savedInstanceState.putInt(currentLevelID, levelManager.getLevelIndex());
     }
 
     public void resetLevel() {
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     public void openLevelSelect() {
         Intent levelSelectIntent = new Intent(this, LevelSelect.class);
         levelSelectIntent.putExtra(levelCountID, levelManager.getLevelCount());
+        levelSelectIntent.putExtra(currentLevelID, levelManager.getLevelIndex());
         startActivityForResult(levelSelectIntent, LEVEL_SELECT_RID);
     }
 

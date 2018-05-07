@@ -36,8 +36,10 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
     private int width;
     private int size;
 
-    private final int borderWidth = 5;
-    private final int circleOffset = 3;
+    private static final int borderWidth = 5;
+    private static final int circleOffset = 3;
+
+    private static final int marginDivisorFactor = 100;
 
 
     private static final int VELOCITY_THRESHOLD = 200;
@@ -103,12 +105,10 @@ public class LevelView extends View implements GestureDetector.OnGestureListener
     public void onDraw(Canvas canvas) {
 
         size = Math.min(this.getWidth(), this.getHeight());
-        margin = size / 100;
-        width = ((size - margin) / 10);
-
+        margin = size / marginDivisorFactor;
+        width = ((size - (2 * margin)) / gridLength);
 
         this.setMeasuredDimension(size, size);
-
 
         if (level == null) {
             return;
