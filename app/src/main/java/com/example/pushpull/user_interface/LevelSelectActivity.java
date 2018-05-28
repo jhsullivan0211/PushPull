@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class LevelSelect extends AppCompatActivity {
+public class LevelSelectActivity extends AppCompatActivity {
 
     private int levelCount;
     private int currentLevelIndex;
@@ -68,7 +68,6 @@ public class LevelSelect extends AppCompatActivity {
 
 
                 if (levelIndex == currentLevelIndex) {
-                    //button.setBackgroundColor(Color.rgb(50, 205, 50));
                     button.getBackground().setColorFilter(Color.rgb(50, 205, 50),
                             PorterDuff.Mode.MULTIPLY);
                 }
@@ -92,7 +91,14 @@ public class LevelSelect extends AppCompatActivity {
     private void setLevel(int levelIndex) {
         myIntent.putExtra(chosenIndexID, levelIndex);
         setResult(RESULT_OK, myIntent);
-        finish();
+        if (myIntent.getBooleanExtra(StartupActivity.startupID, true)) {
+            Intent starterIntent = new Intent(this, MainActivity.class);
+            this.startActivity(starterIntent);
+        }
+        else {
+            finish();
+        }
+
     }
 
 

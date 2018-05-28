@@ -1,35 +1,19 @@
 package com.example.pushpull.triggers;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 
+import com.example.pushpull.game_logic.Actor;
 import com.example.pushpull.game_logic.Level;
 import com.example.pushpull.game_objects.GameObject;
 import com.example.pushpull.myLibrary.Vector2D;
+import com.example.pushpull.user_interface.LevelView;
 
-public abstract class Trigger {
+public interface Trigger extends Actor {
 
-    protected Level level;
-    protected Vector2D location;
-    protected int color;
+    public boolean isFilled();
+    public void act(GameObject filler);
+    public void undo(GameObject leaver);
 
-    public Trigger(Vector2D location, Level level) {
-        this.location = location;
-        this.level = level;
-    }
 
-    public boolean isFilled() {
-        return level.isPositionFilled(location);
-    }
-
-    public Vector2D getLocation() {
-        return location;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public abstract void act(GameObject filler);
-
-    public abstract void undo(GameObject leaver);
 }

@@ -29,17 +29,9 @@ public class LevelManager {
 
 
     public LevelManager(Context context) throws IOException {
-
         this.context = context;
-        try {
-            assetManager = context.getAssets();
-            filePaths = assetManager.list("Levels");
-        }
-        catch (IOException e) {
-            //TODO: handle IOException
-            e.printStackTrace();
-        }
-
+        assetManager = context.getAssets();
+        filePaths = assetManager.list("Levels");
     }
 
     private Level createLevelFromIndex(int index) throws LevelLoadException {
@@ -69,19 +61,10 @@ public class LevelManager {
        return filePaths.length;
     }
 
-    public boolean checkVictory() throws LevelLoadException {
-        if (currentLevel.isComplete()) {
-            advanceLevel();
-            return true;
-        }
-        else {
-            return false;
-        }
+    public boolean checkVictory() {
+        return currentLevel.isComplete();
     }
 
-    public HashMap<Vector2D, Character> getGameStateSerial() {
-        return currentLevel.getSerialState();
-    }
 
     public void advanceLevel() throws LevelLoadException{
         setLevel(levelIndex + 1);
@@ -90,33 +73,8 @@ public class LevelManager {
     public void setLevel(int levelIndex) throws LevelLoadException{
         this.levelIndex = levelIndex;
         this.currentLevel = createLevelFromIndex(levelIndex);
-        setMessage();
+        this.currentLevel.update();
 
-    }
-
-    private void setMessage() {
-        TextView message = ((Activity) context).findViewById(R.id.message);
-        String text = "";
-        switch(levelIndex) {
-            case 0:
-                text = "Swipe to move.";
-                break;
-            case 1:
-                text = "You must cover all of the pink circles to win.";
-                break;
-            case 2:
-                text = "When a square is blue, it can pull but not push.";
-                break;
-            case 3:
-                text = "Move over the red/blue circles to change color.";
-                break;
-            case 9:
-                text = "Blocks can be larger and different shapes, but still can be moved.";
-                break;
-            case 11:
-                text = "A yellow square moves all connected blocks.";
-        }
-        message.setText(text);
     }
 
     public Level getCurrentLevel() {

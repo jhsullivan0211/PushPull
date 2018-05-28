@@ -8,6 +8,19 @@
     tools:layout_editor_absoluteY="81dp">
 
 
+    <com.example.pushpull.user_interface.InputController
+        android:id="@+id/inputController"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:clickable="true"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.446"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.example.pushpull.user_interface.LevelView
         android:id="@+id/levelView"
         android:layout_width="0dp"
@@ -75,7 +88,7 @@
             android:layout_weight="1"
             android:background="@drawable/button"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/exit_icon"
+            app:srcCompat="@drawable/sound_on_icon"
             tools:layout_editor_absoluteX="307dp"
             tools:layout_editor_absoluteY="660dp" />
     </LinearLayout>
@@ -89,38 +102,42 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/gfhaldanormal"
-        android:text="Push all of the gray blocks onto pink circles.\n\n\n"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/winLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:orientation="vertical"
+        android:background="#FFFFFF"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.426">
 
         <TextView
             android:id="@+id/winMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:text="\nSuccess!\n"
+
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Success!"
             android:textAlignment="center"
             android:textColor="@android:color/black"
-            android:textSize="24sp" />
-
-    </LinearLayout>
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

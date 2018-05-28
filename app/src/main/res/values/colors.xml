@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#767987</color>
+    <color name="colorPrimary">#f4f4ef</color>
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="customBackground">#F4F4E3</color>
+    <color name="pushPullRed">#f70025</color>
+    <color name="pushPullBlue">#375e97</color>
+    <color name="pushPullYellow">#FFEC5C</color>
+
+
 </resources>
+
+<!-- primary:  767987, primdark = 303f9f, accent = ff4081-->

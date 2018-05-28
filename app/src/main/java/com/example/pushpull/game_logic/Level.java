@@ -3,6 +3,9 @@ package com.example.pushpull.game_logic;
 
 
 
+    import android.content.Context;
+    import android.util.Log;
+
     import com.example.pushpull.game_objects.Block;
     import com.example.pushpull.game_objects.BlockCluster;
     import com.example.pushpull.game_objects.GameObject;
@@ -12,8 +15,9 @@ package com.example.pushpull.game_logic;
     import com.example.pushpull.triggers.Target;
     import com.example.pushpull.triggers.Transformer;
     import com.example.pushpull.triggers.Trigger;
+    import com.example.pushpull.user_interface.MainActivity;
+
     import java.util.ArrayList;
-    import java.util.Arrays;
     import java.util.Collection;
     import java.util.Collections;
     import java.util.HashMap;
@@ -50,17 +54,26 @@ public class Level {
     private static final int columnNumber = 10;
     private static final int rowNumber = 10;
 
-    private Vector2D levelBounds = new Vector2D(columnNumber - 1, rowNumber - 1);
-    private String layout;
+    private final Vector2D levelBounds = new Vector2D(columnNumber - 1, rowNumber - 1);
+    private final String layout;
+
+
     private List<GameObject> gameObjects = new ArrayList<>();
-    private Map<Vector2D, GameObject> filledPositions = new HashMap<>();
-    private Map<Vector2D, GameObject> gameState = new HashMap<>();
+
     private List<Player> players = new ArrayList<>();
     private List<Trigger> triggers = new ArrayList<>();
+    private List<Wall> walls = new ArrayList<>();
     private List<Target> targets = new ArrayList<>();
     private Map<String, List<BlockCluster>> clusterGroups = new HashMap<>();
-    private Map<GameObject, List<Vector2D.Direction>> borderMap = new HashMap<>();
+
+
+    private Map<Player, Player.Type> typeState = new HashMap<>();
+    private Map<Vector2D, GameObject> filledPositions = new HashMap<>();
+    private Map<Vector2D, GameObject> gameState = new HashMap<>();
+
     private boolean isComplete = false;
+    private boolean finishedLoading = false;
+    private String message = "";
 
 
     /**
@@ -70,66 +83,97 @@ public class Level {
      *
      * @param   layout    The String defining the layout for this level.
      */
-    Level(String layout) {
+    public Level(String layout) throws LevelLoadException {
         this.layout = layout;
         this.load(layout);
-        update();
     }
 
     /**
      * Reads the specified String and adds game objects and triggers to the level.
      * Reads pairs of characters at a time and fills in the level in normal English
      * reading order (left to right, top to bottom), where each pair can be a game
-     * object and/or a trigger, or empty space.  Throws an error if a pair contains
-     * illegally overlappign entities (i.e. two game objects in the same position).
+     * object and/or a trigger, or empty space.  When a '<' is encountered, the remainder
+     * of the file is stored as a message that can be displayed for this particular level.
+     * Throws an error if a pair contains illegally overlapping entities (i.e. two game
+     * objects in the same position).
      *
      * @param layout    The String defining the layout of the level.
      */
-    private void load(String layout) {
+    private void load(String layout) throws LevelLoadException {
         this.gameObjects.clear();
         int position = 0;
         boolean doShift = false;
         int currentCode = -2;
+        StringBuilder messageBuilder = new StringBuilder();
+        for (char id : layout.toCharArray()) {
 
-       for (char id : layout.toCharArray()) {
+           if (id == '>') {
+               finishedLoading = true;
+               continue;
+           }
+
+           if (finishedLoading) {
+               messageBuilder.append(id);
+               continue;
+           }
+
 
            if (id == ','|| id == '\n' || id == ' ') {
                continue;
            }
 
+
+
            int y = position / rowNumber;
            int x = position % columnNumber;
 
            int previousCode = currentCode;
-           currentCode = processID(id, new Vector2D(x, y));
+           Vector2D location = new Vector2D(x, y);
+           currentCode = processID(id, location);
 
            if (doShift) {
-
                if (currentCode != 0 && currentCode == previousCode) {
-                   //TODO: throw error here
-                   return;
+                   throw new LevelLoadException("Level file contains an illegal overlap at "
+                                                                + location.toString());
                }
-
                position += 1;
-           }
-           else {
-
            }
            doShift = !doShift;
         }
 
-        for (List<BlockCluster> clusterList : clusterGroups.values()) {
-            for (BlockCluster cluster : clusterList) {
-                cluster.makeCluster(clusterList);
-            }
+        for (Wall wall : walls) {
+           wall.groupWalls(walls);
+        }
+        message = messageBuilder.toString();
+        updateClusters();
+        captureState(gameState, typeState);
+        update();
+    }
+
+    /**
+     * Captures the current state (positions of game objects and types of players) and
+     * stores it in the two specified maps.
+     *
+     * @param state     Map representing the positions of each game object.
+     * @param type      Map representing the type of each player.
+     */
+
+    private void captureState(Map<Vector2D, GameObject> state,
+                              Map<Player, Player.Type> type) {
+
+        for (Vector2D position : filledPositions.keySet()) {
+            GameObject obj = filledPositions.get(position);
+            state.put(position, obj);
         }
 
-        gameState = new HashMap<>(filledPositions);
+        for (Player pawn : players) {
+            type.put(pawn, pawn.getType());
+        }
     }
 
 
     /**
-     * Reads in a character and spawns game objects, triggers, or nothing at the
+     * Reads in a character and spawns game objects, triggers, or empty space at the
      * specified location.
      *
      * @param idChar        The character id which determines what, if any, thing spawns.
@@ -137,7 +181,7 @@ public class Level {
      * @return              Returns 1 for game objects, -1 for triggers, and 0 for empty space.
      */
     private int processID(Character idChar, Vector2D location) {
-        //TODO: find a better way for this
+        //TODO: find a better way to do this
 
         String id = Character.toString(idChar);
 
@@ -147,7 +191,9 @@ public class Level {
         }
 
         else if (id.equals("w")) {
-            spawnGameObject(new Wall(), location);
+            Wall wall = new Wall();
+            spawnGameObject(wall, location);
+            walls.add(wall);
             return 1;
         }
 
@@ -167,17 +213,13 @@ public class Level {
 
             BlockCluster spawned = new BlockCluster(idChar);
             spawnGameObject(spawned, location);
-
-            if (!clusterGroups.containsKey(id)) {
-                clusterGroups.put(id, new ArrayList<BlockCluster>());
-            }
-            clusterGroups.get(id).add(spawned);
+            addCluster(spawned);
             return 1;
         }
 
         else if (id.matches("[pqr]")) {
             Player.Type spawnType = Player.idToType(idChar);
-            Player spawnPlayer = new Player(this, spawnType);
+            Player spawnPlayer = new Player(spawnType);
             spawnGameObject(spawnPlayer, location);
             players.add(spawnPlayer);
             return 1;
@@ -187,6 +229,7 @@ public class Level {
         else if (id.equals("x")) {
             return 0;
         }
+        //TODO: consider making unidentified codes = blank space
         else {
             throw new RuntimeException("Object ID '" +  ""
                     + id +  "' does not correspond to a known object.");
@@ -194,16 +237,66 @@ public class Level {
     }
 
 
+    private void addCluster(BlockCluster cluster) {
+        String id = cluster.getClusterID().toString();
+        if (!clusterGroups.containsKey(id)) {
+            clusterGroups.put(id, new ArrayList<BlockCluster>());
+        }
+        clusterGroups.get(id).add(cluster);
+    }
+
+
     /**
      * Reverts to the previously saved state defined by game object positions.
      */
     void revertState() {
+
+        if (gameState == null) {
+            return;
+        }
+
         for (Vector2D position : gameState.keySet()) {
-            gameState.get(position).setLocation(position);
+            GameObject obj = gameState.get(position);
+            obj.setLocation(position);
+
+        }
+
+        for (Player player : typeState.keySet()) {
+            player.changeType(typeState.get(player));
         }
         this.filledPositions = gameState;
         update();
     }
+
+    /**
+     *
+     * @return  Returns the current game state in serializable form.
+     */
+    public HashMap<Vector2D, GameObject> getCurrentState() {
+        return new HashMap<>(filledPositions);
+    }
+
+    /**
+     *
+     * @return  Returns the location state for undo in serializable form.
+     */
+    public HashMap<Vector2D, GameObject> getUndoLocationState() {
+        return new HashMap<>(gameState);
+    }
+
+    /**
+     *
+     * @return      Returns a map of each player to its type, in serializable form.
+     */
+    public HashMap<Player, Player.Type> getUndoTypeState() {
+        return new HashMap<>(typeState);
+    }
+
+
+
+
+
+
 
     /**
      * Clears all game objects from the level.
@@ -212,10 +305,13 @@ public class Level {
         gameObjects.clear();
         filledPositions.clear();
         players.clear();
+        walls.clear();
+        clusterGroups.clear();
     }
 
     /**
-     * Spawns a game object in the level at a specified position.
+     * Spawns a game object in the level at a specified position.  If another object
+     * is already in the specified position then that object is deleted.
      * //TODO: throw an error if overlapping spawns?
      *
      * @param gameObject    The game object to spawn.
@@ -223,8 +319,18 @@ public class Level {
      */
     private void spawnGameObject(GameObject gameObject, Vector2D spawnPoint) {
         gameObject.setLocation(spawnPoint);
+        if (filledPositions.get(spawnPoint) != null) {
+            gameObjects.remove(filledPositions.get(spawnPoint));
+        }
         filledPositions.put(spawnPoint, gameObject);
         gameObjects.add(gameObject);
+    }
+
+    private void deleteGameObject(GameObject gameObject) {
+        filledPositions.remove(gameObject.getLocation());
+        gameObjects.remove(gameObject);
+        players.remove(gameObject);
+
     }
 
     /**
@@ -246,81 +352,60 @@ public class Level {
         return adjacents;
     }
 
+    private void updateClusters() {
+        for (List<BlockCluster> clusterList : clusterGroups.values()) {
+            for (BlockCluster cluster : clusterList) {
+                cluster.makeCluster(clusterList);
+            }
+        }
+    }
 
-    /**
-     * Converts the game objects in the level into character codes and returns a map
-     * of positions to game object codes.  This is used to serialize the game state for
-     * saving in Activities.
-     *
-     * //TODO: externalize this method and return the state only?
-     *
-     * @return  The current state, with game objects converted to character codes.
-     */
-    HashMap<Vector2D, Character> getSerialState() {
-        HashMap<Vector2D, Character> serialState = new HashMap<>();
-        for (Vector2D point : filledPositions.keySet()) {
-            GameObject obj = filledPositions.get(point);
+    public void loadState(Map<Vector2D, GameObject> currentState,
+                          Map<Vector2D, GameObject> undoPositionState,
+                          Map<Player, Player.Type> undoTypeState) {
+
+        clearGameObjects();
+        filledPositions = currentState;
+        gameObjects = new ArrayList<>(filledPositions.values());
+
+        for (Vector2D position : filledPositions.keySet()) {
+            GameObject obj = filledPositions.get(position);
 
             if (obj instanceof Player) {
-                Player objPlayer = (Player) obj;
-                switch (objPlayer.getType()) {
-                    case PUSH:
-                        serialState.put(point, 'p');
-                        break;
-                    case PULL:
-                        serialState.put(point, 'q');
-                        break;
-                    case GRABALL:
-                        serialState.put(point, 'r');
-
-                }
-            }
-
-            if (obj instanceof Block) {
-                serialState.put(point, 'b');
-            }
-
-            if (obj instanceof BlockCluster) {
-                BlockCluster bc = (BlockCluster) obj;
-                serialState.put(point, bc.getClusterID());
+                players.add(((Player) obj));
             }
 
             if (obj instanceof Wall) {
-                serialState.put(point, 'w');
+                walls.add(((Wall) obj));
             }
 
-        }
-        return serialState;
-    }
-
-    /**
-     * Reads a map of locations to character codes and spawns objects according to their
-     * code.
-     * //TODO: externalize this?
-     *
-     * @param serialState   A map of positions to character codes; the "serialized state".
-     */
-    public void inflateSerialState(Map<Vector2D, Character> serialState) {
-        clearGameObjects();
-        for (Vector2D point : serialState.keySet()) {
-           processID(serialState.get(point), point);
+            if (obj instanceof BlockCluster) {
+                addCluster((BlockCluster) obj);
+            }
         }
 
-        update();
-    }
 
+        gameState = undoPositionState;
+        typeState = undoTypeState;
+
+
+    }
 
     /**
      * Applies input in a certain direction, i.e. attempts to move all of the
      * players in the level (and push/pull any blocks the players can).  Repeatedly
      * attempts to move each player until there is no longer any change occurring.
-     *
+     * Updates the current state (represented by the gameState and typeState maps)
+     * if a successful movement occurs.
      *
       * @param moveDirection  The input direction.
      */
     public void processInput(Vector2D.Direction moveDirection) {
-        //TODO: fix this up
-        gameState = new HashMap<>(filledPositions);
+
+        Map<Vector2D, GameObject> tempGameState = new HashMap<>();
+        Map<Player, Player.Type> tempTypeState = new HashMap<>();
+        captureState(tempGameState, tempTypeState);
+
 
         List<Player> failures = new ArrayList<>();
         int count = players.size();
@@ -330,9 +415,12 @@ public class Level {
             movePlayers(moveDirection, failures);
         }
 
-        moveFailures(moveDirection);
-        update();
+        if (moveFailures(moveDirection) || failures.size() < players.size()) {
+            gameState = tempGameState;
+            typeState = tempTypeState;
+        }
 
+        update();
 
     }
 
@@ -349,7 +437,7 @@ public class Level {
 
         for (Player player : players) {
             if (player.getType() == Player.Type.GRABALL
-                    && !player.move(moveDirection)) {
+                    && !player.move(moveDirection, this)) {
 
                 //TODO: do we need this here?
                 failures.add(player);
@@ -359,7 +447,7 @@ public class Level {
 
         for (Player player : players) {
             if (player.getType() != Player.Type.GRABALL
-                    && !player.move(moveDirection)) {
+                    && !player.move(moveDirection, this)) {
 
                 failures.add(player);
 
@@ -373,14 +461,15 @@ public class Level {
      *
      * @param moveDirection     Direction to move.
      */
-    private void moveFailures(Vector2D.Direction moveDirection) {
+    private boolean moveFailures(Vector2D.Direction moveDirection) {
+        boolean moved = false;
         int count = 1;
         while (count > 0) {
             count = 0;
             for (Player player : players) {
                 if (player.canMove() && player.getType() == Player.Type.PULL) {
                     //TODO: evaluate following if statement's necessity
-                    if (!player.move(moveDirection)) {
+                    if (!player.move(moveDirection, this)) {
                         if (moveObject(player, moveDirection)) {
                             count += 1;
                         }
@@ -390,7 +479,11 @@ public class Level {
                     }
                 }
             }
+            if (count > 0) {
+                moved = true;
+            }
         }
+        return moved;
     }
 
     /**
@@ -448,12 +541,12 @@ public class Level {
     /**
      * Performs all of the necessary activities that need to occur after an input has
      * been processed.  Checks for victory, resets ability of game objects to move if
-     * they moved before, updates the border graphic calculations, and checks triggers,
-     * acting if they have a game object on them.
+     * they moved before, and checks triggers, acting if they have a game object on them.
      */
-    private void update() {
+    public void update() {
         for (Trigger trigger : triggers) {
             GameObject filler = filledPositions.get(trigger.getLocation());
+            //TODO: fix this garbage
             if (trigger.isFilled()) {
                 trigger.act(filler);
             }
@@ -464,8 +557,6 @@ public class Level {
 
         for (GameObject obj : gameObjects) {
             obj.setMove(true);
-            //TODO: do we need to update borders every time? I think not. Just at the beginning.
-            updateBorders(obj);
         }
 
         int targetCount = 0;
@@ -478,64 +569,7 @@ public class Level {
         if (targetCount == targets.size()) {
             isComplete = true;
         }
-
-
     }
-
-    /**
-     * Calculates what borders a gameObjects needs to have drawn by checking its type
-     * and adjacencies.  Sections of wall and BlockClusters technically exist
-     * as a bunch of connected units, but to contribute to the illusion that
-     * they are single entities the borders which are inside these conglomerates
-     * are not to be drawn, and that depends on level logic, so is calculated here.
-     * Borders to be drawn are kept as a collection of directions.
-     *
-     * @param gameObject    The game objects whose borders should be calculated.
-     */
-
-    private void updateBorders(GameObject gameObject) {
-        List<Vector2D.Direction> borders = new ArrayList<>();
-        borders.addAll(Arrays.asList(Vector2D.Direction.values()));
-
-        if (!(gameObject instanceof Wall || gameObject instanceof BlockCluster)) {
-            //TODO: throw an error here?
-            borderMap.put(gameObject, borders);
-            return;
-        }
-
-
-        for (GameObject other : getAdjacentObjects(gameObject)) {
-            if (!other.getClass().equals(gameObject.getClass())) {
-                continue;
-            }
-            if (gameObject instanceof BlockCluster) {
-                BlockCluster objCluster = (BlockCluster) gameObject;
-                BlockCluster otherCluster = (BlockCluster) other;
-                if (!objCluster.getClusterID().equals(otherCluster.getClusterID())) {
-                    continue;
-                }
-            }
-
-            Vector2D.Direction removal = Vector2D.relativeDirection(gameObject.getLocation(),
-                    other.getLocation());
-            borders.remove(removal);
-
-        }
-        borderMap.put(gameObject, borders);
-    }
-
-    /**
-     * Returns a collection of borders for the specified object.  Borders
-     * are defined by Vector2D.Directions.
-     *
-     * @param obj       The object to get the borders of
-     * @return          Returns a collection of Vector2D.Directions that represent borders
-     *                  to draw.
-     */
-    public List<Vector2D.Direction> getObjectBorders(GameObject obj) {
-        return this.borderMap.get(obj);
-    }
-
 
     /**
      * Checks whether a specified point is a valid point, i.e. that it is not occupied
@@ -588,6 +622,14 @@ public class Level {
     }
 
     /**
+     *
+     * @return  Returns the message for this particular level which is displayed on the UI.
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
      * @return      Returns whether or not the level is complete, i.e. all of the
      *              targets are covered by blocks/clusters.
      */
@@ -608,6 +650,15 @@ public class Level {
     public int getGridLength() {
         return columnNumber;
     }
+
+    /**
+     *
+     * @return      Returns an unmodifiable list of targets for this level.
+     */
+    public List<Target> getTargets() {
+        return Collections.unmodifiableList(targets);
+    }
+
 
 
 

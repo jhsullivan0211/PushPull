@@ -1,10 +1,11 @@
+qx,xx,xx,xx,xx,xx,xx,xx,xx,xx
 xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-qx,1x,1x,!x,!x,!x,xx,0x,xx,0x
-xx,1x,1x,xx,xx,0x,0x,0x,0x,0x
-xx,1x,1x,@x,xx,0x,0x,0x,9x,0x
-xx,1x,1x,@x,xx,bx,px,9x,9x,0x
-2x,1x,1x,@x,xx,6x,7x,9x,9x,0x
-2x,3x,3x,xx,xx,6x,7x,8x,wx,ox
-2x,4x,4x,xx,xx,6x,7x,8x,wx,bx
-xx,4x,4x,5x,5x,5x,xx,xx,wx,bx
-xx,4x,4x,xx,xx,xx,xx,xx,wx,ox
+xx,xx,xx,xx,xx,bx,xx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,xx,1x,1x,xx,wx,xx,xx,ox,ox
+xx,xx,1x,xx,xx,wx,xx,xx,ox,xx
+1x,1x,1x,xx,xx,wx,ox,ox,ox,xx
+1x,ox,1x,xx,xx,wx,ox,xx,ox,xx
+1x,xx,1x,xx,xx,wx,ox,xx,ox,xx
+>Blocks come in all shapes and sizes.

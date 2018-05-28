@@ -1,9 +1,13 @@
 package com.example.pushpull.game_objects;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 
 import com.example.pushpull.game_logic.Level;
 import com.example.pushpull.myLibrary.Vector2D;
+import com.example.pushpull.user_interface.ColorHelper;
+import com.example.pushpull.user_interface.DrawingHelper;
+import com.example.pushpull.user_interface.LevelView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,48 +18,41 @@ import java.util.Set;
 
 public class Player implements GameObject{
 
+
     public enum Type {PUSH, PULL, GRABALL};
 
-    private Level level;
     private Type type;
     private int color;
     private Vector2D location;
-
     private boolean move = true;
 
-
-    public Player(Level level, Type type) {
-        this.level = level;
+    public Player(Type type) {
         changeType(type);
     }
-
 
     public void changeType(Type type) {
         this.type = type;
         if (type == Type.PUSH) {
-            this.color = Color.RED;
+            this.color = ColorHelper.getPushColor();
         }
         if (type == Type.PULL) {
-            this.color = Color.BLUE;
+            this.color = ColorHelper.getPullColor();
         }
         if (type == Type.GRABALL) {
-            this.color = Color.YELLOW;
+            this.color = ColorHelper.getGrabAllColor();
         }
-
     }
 
     public Type getType() {
         return this.type;
     }
 
-
     @Override
     public Vector2D getLocation() {
         return this.location;
     }
 
-
-    public boolean move(Vector2D.Direction direction) {
+    public boolean move(Vector2D.Direction direction, Level level) {
 
         if (!move) {
             return true;
@@ -78,14 +75,14 @@ public class Player implements GameObject{
                 return level.moveGroup(movers, direction);
 
             case GRABALL:
-                movers.addAll(getAllAttached(this));
+                movers.addAll(getAllAttached(this, level));
                 return level.moveGroup(movers, direction);
         }
 
         throw new IllegalArgumentException("Player type is unknown.");
     }
 
-    public Collection<GameObject> getAllAttached(GameObject target) {
+    public Collection<GameObject> getAllAttached(GameObject target, Level level) {
 
         Set<GameObject> attached = new HashSet<>();
         Set<GameObject> next = new HashSet<>();
@@ -122,8 +119,6 @@ public class Player implements GameObject{
         return null;
     }
 
-
-
     private static void addIfValid(GameObject obj, Collection<GameObject> list) {
         if (obj == null) {
             return;
@@ -146,6 +141,12 @@ public class Player implements GameObject{
         list.add(obj);
     }
 
+    @Override
+    public void draw(LevelView levelView, Canvas canvas) {
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
+        drawingHelper.drawSquareBody();
+        drawingHelper.drawAllBorders();
+    }
 
 
     @Override
@@ -158,19 +159,6 @@ public class Player implements GameObject{
         this.location = location;
     }
 
-    public static int getTypeInteger(Type type) {
-        if (type == Type.GRABALL) {
-            return 1;
-        }
-        if (type == Type.PULL) {
-            return 2;
-        }
-        if (type == Type.PUSH) {
-            return 3;
-        }
-
-        throw new IllegalArgumentException("Unknown type used as parameter.");
-    }
 
     @Override
     public void setMove(boolean move) {

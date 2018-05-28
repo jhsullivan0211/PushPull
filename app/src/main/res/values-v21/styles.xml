@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="CustomTheme" parent="android:Theme.Holo.Light.Dialog.NoActionBar.MinWidth">
-        <item name="android:colorPrimary">@android:color/background_dark</item>
+    <style name="CustomTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:colorPrimary">#F4F4C3</item>
+        <item name="android:colorBackground">#F4F4C3</item>
     </style>
 </resources>

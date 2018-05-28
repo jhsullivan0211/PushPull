@@ -3,11 +3,15 @@ package com.example.pushpull.game_objects;
 
 
 
+    import android.graphics.Canvas;
     import android.graphics.Color;
 
 
     import com.example.pushpull.game_logic.Level;
     import com.example.pushpull.myLibrary.Vector2D;
+    import com.example.pushpull.user_interface.ColorHelper;
+    import com.example.pushpull.user_interface.DrawingHelper;
+    import com.example.pushpull.user_interface.LevelView;
 
     import java.util.ArrayList;
     import java.util.Collection;
@@ -19,7 +23,8 @@ package com.example.pushpull.game_objects;
 public class BlockCluster implements GameObject{
 
 
-    private int color = Color.rgb(50,205,50);
+    private int color = ColorHelper.getClusterColor();
+
     private Vector2D location;
     private List<BlockCluster> clusters = new ArrayList<>();
     private boolean move = true;
@@ -30,13 +35,30 @@ public class BlockCluster implements GameObject{
     }
 
     public void makeCluster(List<BlockCluster> template) {
-        clusters = new ArrayList<>(template);
+        clusters = template;
     }
 
 
     @Override
     public Vector2D getLocation() {
         return this.location;
+    }
+
+    @Override
+    public void draw(LevelView levelView, Canvas canvas) {
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
+        drawingHelper.drawSquareBody();
+
+        List<Vector2D.Direction> borderDirections = new ArrayList<>();
+        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
+            if (!hasAdjacentCluster(direction)) {
+                borderDirections.add(direction);
+            }
+        }
+
+        drawingHelper.drawBorders(borderDirections);
+
+
     }
 
 
@@ -51,6 +73,8 @@ public class BlockCluster implements GameObject{
     public void setLocation(Vector2D location) {
         this.location = location;
     }
+
+
 
     public List<BlockCluster> getCluster() {
         return Collections.unmodifiableList(clusters);
@@ -68,6 +92,17 @@ public class BlockCluster implements GameObject{
 
     public Character getClusterID() {
         return clusterID;
+    }
+
+    private boolean hasAdjacentCluster(Vector2D.Direction direction) {
+        Vector2D pointInDirection = getLocation().getPointInDirection(direction);
+        for (BlockCluster cluster : clusters) {
+            if (cluster.getLocation().equals(pointInDirection)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

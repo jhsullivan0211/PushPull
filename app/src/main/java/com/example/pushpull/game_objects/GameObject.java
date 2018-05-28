@@ -3,15 +3,18 @@ package com.example.pushpull.game_objects;
 
 
 
+import com.example.pushpull.game_logic.Actor;
 import com.example.pushpull.myLibrary.Vector2D;
 
-public interface GameObject {
+import java.io.Serializable;
 
-    public Vector2D getLocation();
+public interface GameObject extends Actor {
+
     public void setLocation(Vector2D location);
     public void setMove(boolean move);
     public boolean canMove();
-    public int getColor();
+
+
 
 
 }
