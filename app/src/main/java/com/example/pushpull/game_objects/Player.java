@@ -144,14 +144,8 @@ public class Player implements GameObject{
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawSquareBody();
+        drawingHelper.drawSquareBody(color);
         drawingHelper.drawAllBorders();
-    }
-
-
-    @Override
-    public int getColor() {
-        return this.color;
     }
 
     @Override

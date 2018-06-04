@@ -1,7 +1,9 @@
 package com.example.pushpull.game_logic;
 
 /**
- * Created by joshu on 5/9/2018.
+ * A custom Exception which is used to indicate a problem loading a level.
+ *
+ * Created by Joshua Sullivan on 5/9/2018.
  */
 
 public class LevelLoadException extends Exception {

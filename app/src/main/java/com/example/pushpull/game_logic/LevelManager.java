@@ -1,19 +1,16 @@
 package com.example.pushpull.game_logic;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.widget.TextView;
-
-import com.example.pushpull.R;
-import com.example.pushpull.myLibrary.Vector2D;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 
+/***
+ * Class which handles switching between levels and other level-related events.
+ */
 
 public class LevelManager {
 
@@ -23,8 +20,6 @@ public class LevelManager {
     private String[] filePaths = new String[0];
     private Context context;
     private AssetManager assetManager;
-
-
 
 
 
@@ -66,9 +61,6 @@ public class LevelManager {
     }
 
 
-    public void advanceLevel() throws LevelLoadException{
-        setLevel(levelIndex + 1);
-    }
 
     public void setLevel(int levelIndex) throws LevelLoadException{
         this.levelIndex = levelIndex;

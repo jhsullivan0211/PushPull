@@ -41,4 +41,8 @@ public class ColorHelper {
     public static int getTargetColor() {
         return 0xFFFA6775;
     }
+
+    public static int getWallColor() {
+        return Color.DKGRAY;
+    }
 }

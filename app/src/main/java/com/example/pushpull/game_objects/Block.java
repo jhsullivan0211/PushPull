@@ -20,18 +20,13 @@ public class Block implements GameObject{
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawSquareBody();
+        drawingHelper.drawSquareBody(color);
         drawingHelper.drawAllBorders();
     }
 
     @Override
     public Vector2D getLocation() {
         return this.location;
-    }
-
-    @Override
-    public int getColor() {
-        return this.color;
     }
 
 

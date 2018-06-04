@@ -1,14 +1,17 @@
 package com.example.pushpull.triggers;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
 
 import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.game_logic.Level;
 import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.myLibrary.Vector2D;
-import com.example.pushpull.user_interface.LevelView;
 
+
+/***
+ * This interface defines Actors that do not take up space, can do an action
+ * when they are covered by a game object, and can do a different action when
+ * that game object leaves the trigger.
+ *
+ * Created by Joshua Sullivan on 5/13/2018.
+ */
 public interface Trigger extends Actor {
 
     public boolean isFilled();

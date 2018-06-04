@@ -32,22 +32,22 @@ public class DrawingHelper {
         this.actor = actor;
     }
 
-    public void drawSquareBody() {
-       drawBody(Shape.SQUARE);
+    public void drawSquareBody(int color) {
+       drawBody(Shape.SQUARE, color);
     }
 
-    public void drawCircleBody() {
-        drawBody(Shape.CIRCLE);
+    public void drawCircleBody(int color) {
+        drawBody(Shape.CIRCLE, color);
     }
 
-    private void drawBody(Shape shape) {
+    private void drawBody(Shape shape, int color) {
         Vector2D screenLocation = levelView.getScreenVector(actor.getLocation());
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();
 
         Paint paint = new Paint();
-        paint.setColor(actor.getColor());
+        paint.setColor(color);
         if (shape == Shape.SQUARE) {
             canvas.drawRect(x, y, x + width, y + width, paint);
         }

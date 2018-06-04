@@ -1,9 +1,11 @@
 package com.example.pushpull.user_interface;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String undoPositionID = "PUSHPULL.UNDO_LOC_STATE";
     private static final String undoTypeID = "PUSHPULL.UNDO_TYPE_STATE";
     public static final String levelCountID = "PUSHPULL.LEVEL_COUNT";
+    public static final String maxLevelID = "PUSHPULL.MAX_LEVEL";
+    public static final String dataFileName = "PUSHPULL_DATA";
 
     public static final String[] winMessages = {"Success!", "Brilliant!", "Marvelous!",
                                                 "Excellent!", "Well done!", "Fantastic!",
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         levelView = findViewById(R.id.levelView);
         inputController = findViewById(R.id.inputController);
+        Intent intent = getIntent();
 
 
         try {
@@ -84,7 +89,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
             else {
-                loadLevel(0);
+                int currentLevelIndex = intent.getIntExtra(currentLevelID, -1);
+                if (currentLevelIndex == -1) {
+                    //TODO: throw error popup
+                    Log.d("ERROR", "onCreate: Error");
+                }
+                loadLevel(currentLevelIndex);
+                openLevelSelect();
             }
 
         }
@@ -105,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
         savedInstanceState.putSerializable(gameStateID, level.getCurrentState());
         savedInstanceState.putSerializable(undoPositionID, level.getUndoLocationState());
         savedInstanceState.putSerializable(undoTypeID, level.getUndoTypeState());
-
         savedInstanceState.putInt(currentLevelID, levelManager.getLevelIndex());
     }
 
@@ -132,8 +142,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadLevel(int index) {
         try {
+
+            SharedPreferences preferences = getSharedPreferences(dataFileName, 0);
+            SharedPreferences.Editor editor = preferences.edit();
+            int maxLevel;
+            if (!preferences.contains(maxLevelID)) {
+                editor.putInt(maxLevelID, 0);
+                editor.apply();
+                maxLevel = 0;
+            }
+            else {
+                maxLevel = preferences.getInt(maxLevelID, -1);
+                if (maxLevel == -1) {
+                    //TODO: throw error, popup
+                    Log.d("Error", "loadLevel: Error!");
+                }
+            }
+
+            if (index > maxLevel) {
+                editor.putInt(maxLevelID, index);
+                editor.apply();
+            }
+
             levelManager.setLevel(index);
             levelView.setLevel(levelManager.getCurrentLevel());
+
             TextView message = findViewById(R.id.message);
             message.setText(levelManager.getCurrentLevel().getMessage());
         }
@@ -213,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void openLevelSelect() {
+
         Intent levelSelectIntent = new Intent(this, LevelSelectActivity.class);
         levelSelectIntent.putExtra(levelCountID, levelManager.getLevelCount());
         levelSelectIntent.putExtra(currentLevelID, levelManager.getLevelIndex());

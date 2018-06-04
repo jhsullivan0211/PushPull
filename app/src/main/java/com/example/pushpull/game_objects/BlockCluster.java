@@ -47,7 +47,7 @@ public class BlockCluster implements GameObject{
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawSquareBody();
+        drawingHelper.drawSquareBody(color);
 
         List<Vector2D.Direction> borderDirections = new ArrayList<>();
         for (Vector2D.Direction direction : Vector2D.Direction.values()) {
@@ -59,13 +59,6 @@ public class BlockCluster implements GameObject{
         drawingHelper.drawBorders(borderDirections);
 
 
-    }
-
-
-
-    @Override
-    public int getColor() {
-        return this.color;
     }
 
 

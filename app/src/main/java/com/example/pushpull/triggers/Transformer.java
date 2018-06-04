@@ -68,14 +68,9 @@ public class Transformer implements Trigger {
     }
 
     @Override
-    public int getColor() {
-        return color;
-    }
-
-    @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawCircleBody();
+        drawingHelper.drawCircleBody(color);
     }
 
 

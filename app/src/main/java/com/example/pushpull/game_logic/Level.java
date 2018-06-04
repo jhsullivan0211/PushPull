@@ -1,11 +1,6 @@
 package com.example.pushpull.game_logic;
 
 
-
-
-    import android.content.Context;
-    import android.util.Log;
-
     import com.example.pushpull.game_objects.Block;
     import com.example.pushpull.game_objects.BlockCluster;
     import com.example.pushpull.game_objects.GameObject;
@@ -15,8 +10,6 @@ package com.example.pushpull.game_logic;
     import com.example.pushpull.triggers.Target;
     import com.example.pushpull.triggers.Transformer;
     import com.example.pushpull.triggers.Trigger;
-    import com.example.pushpull.user_interface.MainActivity;
-
     import java.util.ArrayList;
     import java.util.Collection;
     import java.util.Collections;
@@ -45,7 +38,7 @@ package com.example.pushpull.game_logic;
  * with blocks.
  *
  *
- *
+ * Created by Joshua Sullivan on 04/30/2018
  */
 
 public class Level {
