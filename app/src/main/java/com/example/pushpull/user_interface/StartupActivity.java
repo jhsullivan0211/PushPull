@@ -1,7 +1,10 @@
 package com.example.pushpull.user_interface;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +18,7 @@ import java.io.IOException;
 
 public class StartupActivity extends AppCompatActivity {
 
-    private LevelManager levelManager;
+
     private int currentLevelIndex;
     public static final String startupID = "PUSHPULL.STARTUP";
     public static final String soundID = "PUSHPULL.SOUND";
@@ -26,15 +29,8 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
 
-        try {
-            levelManager = new LevelManager(this);
-            //TODO: open file, find current level, set currentLevel to that.
-            currentLevelIndex = 0;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            //TODO: popup error
-        }
+        SharedPreferences preferences = getSharedPreferences(MainActivity.dataFileName, 0);
+        currentLevelIndex = preferences.getInt(MainActivity.currentLevelID, 0);
 
         ImageButton playButton = findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +47,13 @@ public class StartupActivity extends AppCompatActivity {
                 toggleSound();
             }
         });
+    }
+
+    @Override
+    protected  void onResume() {
+        super.onResume();
+        SharedPreferences preferences = getSharedPreferences(MainActivity.dataFileName, 0);
+        currentLevelIndex = preferences.getInt(MainActivity.currentLevelID, 0);
     }
 
     private void startGame() {
@@ -70,6 +73,7 @@ public class StartupActivity extends AppCompatActivity {
         }
         soundOn = !soundOn;
     }
+
 
 
 }
