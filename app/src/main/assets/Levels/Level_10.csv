@@ -1,11 +1,10 @@
-qx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,bx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,xx,1x,1x,xx,wx,xx,xx,ox,ox
-xx,xx,1x,xx,xx,wx,xx,xx,ox,xx
-1x,1x,1x,xx,xx,wx,ox,ox,ox,xx
-1x,ox,1x,xx,xx,wx,ox,xx,ox,xx
-1x,xx,1x,xx,xx,wx,ox,xx,ox,xx
->Blocks come in all shapes and sizes.
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,xx,xx,qx,xx,xx,wx,xx,wx
+wx,wx,xx,bx,bx,bx,xx,wx,xx,wx
+wx,wx,wx,ox,ox,ox,wx,wx,xx,wx
+wx,wx,wx,ox,ox,ox,wx,wx,xx,wx
+wx,wx,xx,bx,bx,bx,xx,wx,xx,wx
+wx,wx,xx,xx,px,xx,xx,wx,xx,wx
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx

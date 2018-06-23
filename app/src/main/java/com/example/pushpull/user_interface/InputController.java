@@ -1,6 +1,5 @@
 package com.example.pushpull.user_interface;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
@@ -10,7 +9,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.pushpull.myLibrary.Vector2D;
+import com.example.pushpull.game_logic.Vector2D;
 
 /**
  * Created by joshu on 5/15/2018.
@@ -20,7 +19,7 @@ public class InputController extends View implements GestureDetector.OnGestureLi
 
 
     private GestureDetectorCompat gestureDetector;
-    private static final int DISTANCE_THRESHOLD = 10;
+    private static final int DISTANCE_THRESHOLD = 5;
     private boolean enabled = true;
     private Context context;
 
@@ -114,8 +113,8 @@ public class InputController extends View implements GestureDetector.OnGestureLi
     }
 
     private void applyMovement(Vector2D.Direction direction) {
-        if (context instanceof MainActivity) {
-            ((MainActivity) context).handleInput(direction);
+        if (context instanceof PlayActivity) {
+            ((PlayActivity) context).handleInput(direction);
         }
 
 

@@ -2,9 +2,7 @@ package com.example.pushpull.game_objects;
 
 
 import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.myLibrary.Vector2D;
-
-import java.io.Serializable;
+import com.example.pushpull.game_logic.Vector2D;
 
 
 /***

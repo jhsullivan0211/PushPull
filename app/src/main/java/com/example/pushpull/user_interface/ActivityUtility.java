@@ -1,0 +1,41 @@
+package com.example.pushpull.user_interface;
+
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.support.v7.app.AlertDialog;
+
+/**
+ * Created by joshu on 6/4/2018.
+ */
+
+public class ActivityUtility {
+
+    public static final String currentLevelID = "PUSHPULL.CURRENT_LEVEL";
+    public static final String gameStateID = "PUSHPULL.GAME_STATE";
+    public static final String undoPositionID = "PUSHPULL.UNDO_LOC_STATE";
+    public static final String undoTypeID = "PUSHPULL.UNDO_TYPE_STATE";
+    public static final String levelCountID = "PUSHPULL.LEVEL_COUNT";
+    public static final String maxLevelID = "PUSHPULL.MAX_LEVEL";
+    public static final String dataFileName = "PUSHPULL_DATA";
+    public static final String chosenIndexID = "PUSHPULL.LEVEL_INDEX_CHOSEN";
+    public static final String soundID = "PUSHPULL.SOUND";
+    public static final String exitID = "PUSHPULL.EXIT";
+
+    public static void showAlert(String title, String message, final Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        activity.finish();
+                    }
+                })
+                .show();
+
+        AlertDialog dialog = builder.create();
+
+    }
+
+}

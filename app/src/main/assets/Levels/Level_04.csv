@@ -1,11 +1,12 @@
-px,xx,xx,xx,xx,xx,xx,bx,bx,xx
+po,xx,xx,xx,xx,xx,xx,xx,xx,ox
 xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,wx,wx,wx,wx,wx,xx,xx,xx,xx
-xx,bx,xx,xx,ox,wx,Px,xx,xx,xx
-xx,wx,wx,wx,wx,wx,xx,xx,xx,xx
 xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,wx,wx,wx,wx,wx,xx,xx,xx,xx
-xx,ox,xx,xx,bx,wx,Qx,xx,xx,xx
-xx,wx,wx,wx,wx,wx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,ox,ox,xx
+xx,xx,xx,Px,xx,wx,wx,xx,xx,xx
+xx,xx,xx,xx,bx,bx,wx,xx,xx,xx
+xx,xx,xx,wx,bx,bx,xx,xx,xx,xx
+xx,xx,xx,wx,wx,xx,Qx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+ox,xx,xx,xx,xx,xx,xx,xx,xx,ox
 >Move over the red/blue circles to change color.
+

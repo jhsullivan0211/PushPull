@@ -1,33 +1,22 @@
 package com.example.pushpull.user_interface;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.pushpull.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,10 +26,9 @@ public class LevelSelectActivity extends AppCompatActivity {
     private int levelCount;
     private int currentLevelIndex;
     private Intent myIntent;
-    private Drawable lockIcon;
     private int maxLevel;
 
-    public static final String chosenIndexID = "PUSHPULL.LEVEL_INDEX_CHOSEN";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +37,15 @@ public class LevelSelectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_level_select);
 
         myIntent = getIntent();
-        levelCount = myIntent.getIntExtra(MainActivity.levelCountID, 0);
-        currentLevelIndex = myIntent.getIntExtra(MainActivity.currentLevelID, -1);
-
-        SharedPreferences preferences = getSharedPreferences(MainActivity.dataFileName, 0);
-
-        //TODO: swap the following
-        //maxLevel = preferences.getInt(MainActivity.maxLevelID, -1);
-        maxLevel = 50;
-        //TODO: end here
+        levelCount = myIntent.getIntExtra(ActivityUtility.levelCountID, 0);
+        currentLevelIndex = myIntent.getIntExtra(ActivityUtility.currentLevelID, -1);
+        SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
+        maxLevel = preferences.getInt(ActivityUtility.maxLevelID, -1);
 
 
-        if (maxLevel == -1) {
-            //TODO: put a popup here
-            return;
-        }
-
-        if (levelCount == 0) {
-            //TODO: put a popup here
-            return;
+        if (levelCount == 0 || maxLevel == -1) {
+            ActivityUtility.showAlert("Level Error", "An error occurred while " +
+                    "accessing app files.  The application will close.", this);
         }
 
         List<Integer> levels = new ArrayList<>();
@@ -116,8 +94,15 @@ public class LevelSelectActivity extends AppCompatActivity {
         return adapter;
     }
     private void setLevel(int levelIndex) {
-        myIntent.putExtra(chosenIndexID, levelIndex);
-        setResult(RESULT_OK, myIntent);
+
+        if (levelIndex == currentLevelIndex) {
+            setResult(RESULT_CANCELED, myIntent);
+        }
+        else {
+            myIntent.putExtra(ActivityUtility.chosenIndexID, levelIndex);
+            setResult(RESULT_OK, myIntent);
+        }
+
         finish();
 
     }

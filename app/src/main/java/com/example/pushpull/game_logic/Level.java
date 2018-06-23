@@ -6,7 +6,6 @@ package com.example.pushpull.game_logic;
     import com.example.pushpull.game_objects.GameObject;
     import com.example.pushpull.game_objects.Player;
     import com.example.pushpull.game_objects.Wall;
-    import com.example.pushpull.myLibrary.Vector2D;
     import com.example.pushpull.triggers.Target;
     import com.example.pushpull.triggers.Transformer;
     import com.example.pushpull.triggers.Trigger;
@@ -23,11 +22,11 @@ package com.example.pushpull.game_logic;
  * movement, checks win conditions, processes all game events, and allows for specific levels
  * to be loaded using special string sequences.
  * <p>
- * The level is structured as a grid of squares (currently 10x10, but may change in the future),
- * with each square potentially holding a trigger, which cannot be moved but influences other
- * pieces, and a game object which can be moved around.  Game objects "take up space", i.e.
- * they cannot be moved over or overlap in any way, while triggers cannot move and do not
- * take up space (they can have a game object occupying the same space).
+ * The level is structured as a grid of squares (currently fixed at 10x10, but may change to be
+ * variable in the future), with each square potentially holding a trigger, which cannot be moved
+ * but influences other pieces, and a game object which can be moved around.  Game objects "take up
+ * space", i.e. they cannot be moved over or overlap in any way, while triggers cannot move and do
+ * not take up space (they can have a game object occupying the same space).
  *<p>
  * The level is manipulated using directional movement (using the Direction enum from
  * @link myLibrary.Vector2D) processed from inputs.  Each movement causes all of the players
@@ -173,8 +172,7 @@ public class Level {
      * @param location      The location of the spawn.
      * @return              Returns 1 for game objects, -1 for triggers, and 0 for empty space.
      */
-    private int processID(Character idChar, Vector2D location) {
-        //TODO: find a better way to do this
+    private int processID(Character idChar, Vector2D location) throws LevelLoadException {
 
         String id = Character.toString(idChar);
 
@@ -222,9 +220,8 @@ public class Level {
         else if (id.equals("x")) {
             return 0;
         }
-        //TODO: consider making unidentified codes = blank space
         else {
-            throw new RuntimeException("Object ID '" +  ""
+            throw new LevelLoadException("Object ID '" +  ""
                     + id +  "' does not correspond to a known object.");
         }
     }
@@ -303,9 +300,27 @@ public class Level {
     }
 
     /**
+     * Removes the specified game object from the game.
+     * @param gameObject
+     */
+    private void removeGameObject(GameObject gameObject) {
+        gameObjects.remove(gameObject);
+        if (filledPositions.get(gameObject.getLocation()).equals(gameObject)) {
+            filledPositions.remove(gameObject.getLocation());
+        }
+        players.remove(gameObject);
+        walls.remove(gameObject);
+
+        if (gameObject instanceof BlockCluster) {
+            BlockCluster blockCluster = (BlockCluster) gameObject;
+            clusterGroups.get(blockCluster.getClusterID()).remove(blockCluster);
+        }
+
+    }
+
+    /**
      * Spawns a game object in the level at a specified position.  If another object
      * is already in the specified position then that object is deleted.
-     * //TODO: throw an error if overlapping spawns?
      *
      * @param gameObject    The game object to spawn.
      * @param spawnPoint    The location of the object in the game.
@@ -313,18 +328,12 @@ public class Level {
     private void spawnGameObject(GameObject gameObject, Vector2D spawnPoint) {
         gameObject.setLocation(spawnPoint);
         if (filledPositions.get(spawnPoint) != null) {
-            gameObjects.remove(filledPositions.get(spawnPoint));
+            removeGameObject(filledPositions.get(spawnPoint));
         }
         filledPositions.put(spawnPoint, gameObject);
         gameObjects.add(gameObject);
     }
 
-    private void deleteGameObject(GameObject gameObject) {
-        filledPositions.remove(gameObject.getLocation());
-        gameObjects.remove(gameObject);
-        players.remove(gameObject);
-
-    }
 
     /**
      * Gets all of the game objects that are edge adjacent to the specified game object.
@@ -431,11 +440,8 @@ public class Level {
         for (Player player : players) {
             if (player.getType() == Player.Type.GRABALL
                     && !player.move(moveDirection, this)) {
-
-                //TODO: do we need this here?
                 failures.add(player);
             }
-
         }
 
         for (Player player : players) {
@@ -462,13 +468,13 @@ public class Level {
             for (Player player : players) {
                 if (player.canMove() && player.getType() == Player.Type.PULL) {
                     //TODO: evaluate following if statement's necessity
-                    if (!player.move(moveDirection, this)) {
+                    if (player.move(moveDirection, this)) {
+                        count += 1;
+                    }
+                    else {
                         if (moveObject(player, moveDirection)) {
                             count += 1;
                         }
-                    }
-                    else {
-                        count += 1;
                     }
                 }
             }
@@ -554,8 +560,7 @@ public class Level {
 
         int targetCount = 0;
         for (Target target : targets) {
-            GameObject filler = filledPositions.get(target.getLocation());
-            if (filler != null && !(filler instanceof Player)) {
+            if (target.isFilled()) {
                 targetCount += 1;
             }
         }

@@ -1,14 +1,11 @@
 package com.example.pushpull.user_interface;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 
 import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.myLibrary.Vector2D;
+import com.example.pushpull.game_logic.Vector2D;
 
 import java.util.Collection;
 

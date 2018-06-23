@@ -1,31 +1,21 @@
 package com.example.pushpull.user_interface;
 
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.support.v4.view.GestureDetectorCompat;
-import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import com.example.pushpull.R;
 import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_logic.LevelManager;
 import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.myLibrary.Vector2D;
+import com.example.pushpull.game_logic.Vector2D;
 import com.example.pushpull.triggers.Target;
 import com.example.pushpull.triggers.Trigger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 public class LevelView extends View {
@@ -99,7 +89,7 @@ public class LevelView extends View {
 
         for (Target target : level.getTargets()) {
             if (target.isFilled()) {
-                target.drawIcon(this, canvas);
+                target.drawSuccessIcon(this, canvas);
             }
         }
     }
@@ -122,7 +112,13 @@ public class LevelView extends View {
     }
 
     public int getSize() {
-        return  Math.min(this.getWidth(), this.getHeight());
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return this.getHeight();
+        }
+        else {
+            return this.getWidth();
+        }
     }
 
     private int getMargin() {
