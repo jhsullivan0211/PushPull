@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.example.pushpull.R;
+import com.jhsullivan.pushpull.R;
 import com.example.pushpull.game_logic.Level;
 import com.example.pushpull.game_objects.GameObject;
 import com.example.pushpull.game_logic.Vector2D;
