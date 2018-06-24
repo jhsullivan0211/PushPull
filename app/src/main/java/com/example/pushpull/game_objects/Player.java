@@ -202,9 +202,9 @@ public class Player implements GameObject{
         if (type == Type.GRABALL) {
             this.color = ColorHelper.getGrabAllColor();
         }
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawSquareBody(color);
-        drawingHelper.drawAllBorders();
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+        drawingHelper.drawSquareBody(color, location);
+        drawingHelper.drawAllBorders(location);
     }
 
     /**

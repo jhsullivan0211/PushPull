@@ -9,8 +9,11 @@ import com.example.pushpull.game_logic.Vector2D;
 
 import java.util.Collection;
 
+
 /**
- * Created by joshu on 5/13/2018.
+ * Contains useful methods for drawing onto a Canvas of a LevelView.
+ *
+ * Created by Joshua Sullivan on 5/13/2018.
  */
 
 public class DrawingHelper {
@@ -20,25 +23,31 @@ public class DrawingHelper {
 
     private LevelView levelView;
     private Canvas canvas;
-    private Actor actor;
 
 
-    public DrawingHelper(LevelView levelView, Canvas canvas, Actor actor) {
+
+    /**
+     * Basic constructor for the DrawingHelper class.  Assigns parameters to member variables.
+     *
+     *
+     * @param levelView     The LevelView in which to get drawing specifications.
+     * @param canvas        The Canvas on which to draw.
+     */
+    public DrawingHelper(LevelView levelView, Canvas canvas) {
         this.levelView = levelView;
         this.canvas = canvas;
-        this.actor = actor;
     }
 
-    public void drawSquareBody(int color) {
-       drawBody(Shape.SQUARE, color);
+    public void drawSquareBody(int color, Vector2D location) {
+       drawBody(Shape.SQUARE, location, color);
     }
 
-    public void drawCircleBody(int color) {
-        drawBody(Shape.CIRCLE, color);
+    public void drawCircleBody(int color, Vector2D location) {
+        drawBody(Shape.CIRCLE, location, color);
     }
 
-    private void drawBody(Shape shape, int color) {
-        Vector2D screenLocation = levelView.getScreenVector(actor.getLocation());
+    private void drawBody(Shape shape, Vector2D location, int color) {
+        Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();
@@ -54,21 +63,21 @@ public class DrawingHelper {
         }
     }
 
-    public void drawAllBorders() {
+    public void drawAllBorders(Vector2D location) {
         for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-            drawBorder(direction);
+            drawBorder(direction, location);
         }
     }
 
-    public void drawBorders(Collection<Vector2D.Direction> directions) {
+    public void drawBorders(Collection<Vector2D.Direction> directions, Vector2D location) {
         for (Vector2D.Direction direction : directions) {
-            drawBorder(direction);
+            drawBorder(direction, location);
         }
     }
 
-    public void drawBorder(Vector2D.Direction direction) {
+    public void drawBorder(Vector2D.Direction direction, Vector2D location) {
 
-        Vector2D screenLocation = levelView.getScreenVector(actor.getLocation());
+        Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();
@@ -96,8 +105,8 @@ public class DrawingHelper {
         }
     }
 
-    public void drawIcon(Drawable icon) {
-        Vector2D screenLocation = levelView.getScreenVector(actor.getLocation());
+    public void drawIcon(Drawable icon, Vector2D location) {
+        Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();

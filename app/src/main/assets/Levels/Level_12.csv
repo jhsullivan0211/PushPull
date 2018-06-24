@@ -1,11 +1,10 @@
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,rx,xx,bx,xx,bx,xx,bx,xx,bx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,bx,xx,bx,xx,xx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,bx,xx,xx,xx,bx,ox,ox,ox,ox
-xx,xx,xx,xx,xx,ox,ox,xx,xx,ox
-xx,bx,xx,xx,xx,ox,xx,bx,xx,xx
-xx,xx,xx,xx,xx,ox,xx,xx,xx,xx
-xx,bx,xx,xx,xx,ox,ox,xx,xx,xx
->A yellow square moves with all the blocks connected to it.
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+wx,wx,wx,xx,xx,xx,xx,xx,wx,wx
+ox,ox,ox,ox,xx,xx,xx,xx,wx,wx
+ox,ox,ox,ox,xx,wx,wx,xx,xx,wx
+wx,wx,px,xx,bx,wx,wx,bx,xx,wx
+wx,wx,wx,xx,bx,wx,wx,bx,xx,wx
+wx,wx,wx,xx,bx,wx,wx,bx,xx,wx
+wx,wx,wx,xx,bx,Px,Qx,bx,xx,wx

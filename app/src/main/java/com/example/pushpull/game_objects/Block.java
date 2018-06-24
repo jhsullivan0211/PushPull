@@ -28,9 +28,9 @@ public class Block implements GameObject{
      */
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawSquareBody(color);
-        drawingHelper.drawAllBorders();
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+        drawingHelper.drawSquareBody(color, location);
+        drawingHelper.drawAllBorders(location);
     }
 
     /**

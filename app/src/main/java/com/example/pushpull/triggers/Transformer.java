@@ -100,7 +100,7 @@ public class Transformer implements Trigger {
      */
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
         int color = 0;
         switch (type) {
             case PULL:
@@ -114,7 +114,7 @@ public class Transformer implements Trigger {
                 break;
         }
 
-        drawingHelper.drawCircleBody(color);
+        drawingHelper.drawCircleBody(color, location);
 
     }
 

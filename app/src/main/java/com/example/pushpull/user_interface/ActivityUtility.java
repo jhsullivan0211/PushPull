@@ -6,7 +6,10 @@ import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 
 /**
- * Created by joshu on 6/4/2018.
+ * A utility class containing static methods for activities, as well as several static String IDs.
+ * This class should not be instantiated.
+ *
+ * Created by Joshua Sullivan on 6/4/2018.
  */
 
 public class ActivityUtility {
@@ -22,6 +25,14 @@ public class ActivityUtility {
     public static final String soundID = "PUSHPULL.SOUND";
     public static final String exitID = "PUSHPULL.EXIT";
 
+    /**
+     * Given a title, message, and activity, shows an alert with the given title and message on
+     * the activity and then closes the activity.  Used primarily for critical errors.
+     *
+     * @param title     The title of the alert.
+     * @param message   The message of the alert.
+     * @param activity  The activity on which to show the alert.
+     */
     public static void showAlert(String title, String message, final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(title)

@@ -77,8 +77,9 @@ public class Target implements Trigger {
      */
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawIcon(PlayActivity.resourceAccess.getDrawable(R.drawable.target_icon));
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+        drawingHelper.drawIcon(PlayActivity.resourceAccess.getDrawable(R.drawable.target_icon),
+                                location);
     }
 
     /**
@@ -88,8 +89,8 @@ public class Target implements Trigger {
      * @param canvas        The Canvas on which to draw the target.
      */
     public void drawSuccessIcon(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas, this);
-        drawingHelper.drawIcon(levelView.targetIcon);
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+        drawingHelper.drawIcon(levelView.targetIcon, location);
     }
 
 
