@@ -1,13 +1,16 @@
-package com.example.pushpull.game_objects;
+package com.jhsullivan.pushpull.game_objects;
 
-import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 
-import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_logic.Vector2D;
-import com.example.pushpull.user_interface.ColorHelper;
-import com.example.pushpull.user_interface.DrawingHelper;
-import com.example.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Level;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.user_interface.ColorHelper;
+import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+import com.jhsullivan.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +34,7 @@ public class Player implements GameObject{
     private Vector2D location;
     private boolean move = true;
 
+
     /**
      * Constructor for the Player object.
      *
@@ -38,7 +42,6 @@ public class Player implements GameObject{
      */
     public Player(Type type) {
         changeType(type);
-
     }
 
     /**
@@ -193,16 +196,18 @@ public class Player implements GameObject{
      */
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
+        int color = ColorHelper.getPushColor();
+        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
         if (type == Type.PUSH) {
-            this.color = ColorHelper.getPushColor();
+            color = ColorHelper.getPushColor();
         }
         if (type == Type.PULL) {
-            this.color = ColorHelper.getPullColor();
+            color = ColorHelper.getPullColor();
         }
         if (type == Type.GRABALL) {
-            this.color = ColorHelper.getGrabAllColor();
+            color = ColorHelper.getGrabAllColor();
         }
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+
         drawingHelper.drawSquareBody(color, location);
         drawingHelper.drawAllBorders(location);
     }

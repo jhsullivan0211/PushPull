@@ -1,4 +1,4 @@
-package com.example.pushpull.user_interface;
+package com.jhsullivan.pushpull.user_interface;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -24,6 +24,8 @@ public class ActivityUtility {
     public static final String chosenIndexID = "PUSHPULL.LEVEL_INDEX_CHOSEN";
     public static final String soundID = "PUSHPULL.SOUND";
     public static final String exitID = "PUSHPULL.EXIT";
+    public static final String levelWidthID = "PUSHPULL.LEVELWIDTH";
+
 
     /**
      * Given a title, message, and activity, shows an alert with the given title and message on

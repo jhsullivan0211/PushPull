@@ -1,11 +1,10 @@
-package com.example.pushpull.user_interface;
+package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 
-import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
 
 import java.util.Collection;
 
@@ -18,8 +17,9 @@ import java.util.Collection;
 
 public class DrawingHelper {
     private enum Shape {CIRCLE, SQUARE};
-    private static final int borderWidth = 5;
-    private static final int circleOffset = 5;
+    private int borderWidth;
+    private int borderWidthFactor = 205;
+
 
     private LevelView levelView;
     private Canvas canvas;
@@ -36,23 +36,46 @@ public class DrawingHelper {
     public DrawingHelper(LevelView levelView, Canvas canvas) {
         this.levelView = levelView;
         this.canvas = canvas;
+        this.borderWidth = levelView.getSize() / borderWidthFactor;
     }
 
+    /**
+     * Draws a filled-in square that is the specified color, at the specified location.
+     *
+     * @param color     The color of the square's fill.
+     * @param location  The location to draw the square.
+     */
     public void drawSquareBody(int color, Vector2D location) {
        drawBody(Shape.SQUARE, location, color);
     }
 
+    /**
+     * Draws a filled-in circle that is the specified color, at the specified location.
+     *
+     * @param color         The color of the circle's fill.
+     * @param location      The location to draw the circle.
+     */
     public void drawCircleBody(int color, Vector2D location) {
         drawBody(Shape.CIRCLE, location, color);
     }
 
+    /**
+     * Draws a body of specified shape and color at the specified location.  This method
+     * is not publicly accessed; instead, use drawSquareBody or drawCircleBody.
+     *
+     * @param shape     The shape of the body to draw.
+     * @param location  The location to draw the shape.
+     * @param color     The color of the shape to draw.
+     */
     private void drawBody(Shape shape, Vector2D location, int color) {
         Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();
+        int circleOffset = levelView.getActorUnit() / 10;
 
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setColor(color);
         if (shape == Shape.SQUARE) {
             canvas.drawRect(x, y, x + width, y + width, paint);
@@ -63,18 +86,36 @@ public class DrawingHelper {
         }
     }
 
+    /**
+     * Draws all four borders at the specified location, forming a square.
+     *
+     * @param location  The location at which to draw the borders.
+     */
     public void drawAllBorders(Vector2D location) {
         for (Vector2D.Direction direction : Vector2D.Direction.values()) {
             drawBorder(direction, location);
         }
     }
 
+    /**
+     * Draws all of the borders in the directions found in the specified list, at the
+     * specified location.
+     *
+     * @param directions    A Collection of Directions in which to draw borders.
+     * @param location      The location in which to draw the borders.
+     */
     public void drawBorders(Collection<Vector2D.Direction> directions, Vector2D location) {
         for (Vector2D.Direction direction : directions) {
             drawBorder(direction, location);
         }
     }
 
+    /**
+     * Draws a border in the specified direction, relative to the center of the square.
+     *
+     * @param direction     The direction defining which edge should have a border.
+     * @param location      The location at which to draw the border.
+     */
     public void drawBorder(Vector2D.Direction direction, Vector2D location) {
 
         Vector2D screenLocation = levelView.getScreenVector(location);
@@ -105,6 +146,12 @@ public class DrawingHelper {
         }
     }
 
+    /**
+     * Draws the specified Drawable at the given location.
+     *
+     * @param icon      The icon to draw.
+     * @param location  The location to draw the icon.
+     */
     public void drawIcon(Drawable icon, Vector2D location) {
         Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();

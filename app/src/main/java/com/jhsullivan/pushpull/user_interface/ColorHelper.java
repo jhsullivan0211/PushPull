@@ -1,16 +1,19 @@
-package com.example.pushpull.user_interface;
+package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Color;
 
 /**
- * Created by joshu on 5/14/2018.
+ * A utility class for getting access to colors from anywhere, without accessing the resource
+ * file.  This may be deprecated in favor of the XML resources later.  All methods simply get
+ * the int for a particular color.
+ *
+ * Created by Joshua Sullivan on 5/14/2018.
  */
 
 public class ColorHelper {
 
     public static int getBlockColor() {
         return Color.LTGRAY;
-       // return 0xFF506D2F;
     }
 
     public static int getClusterColor() {
@@ -36,10 +39,6 @@ public class ColorHelper {
 
     public static int getBorderColor() {
         return 0xFF00171B;
-    }
-
-    public static int getTargetColor() {
-        return 0xFFFA6775;
     }
 
     public static int getWallColor() {

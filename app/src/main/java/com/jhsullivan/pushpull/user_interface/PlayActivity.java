@@ -1,4 +1,4 @@
-package com.example.pushpull.user_interface;
+package com.jhsullivan.pushpull.user_interface;
 
 
 import android.content.Intent;
@@ -7,16 +7,21 @@ import android.content.res.Resources;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import com.example.pushpull.R;
-import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_logic.LevelLoadException;
-import com.example.pushpull.game_logic.LevelManager;
-import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.game_objects.Player;
-import com.example.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Level;
+import com.jhsullivan.pushpull.game_logic.LevelLoadException;
+import com.jhsullivan.pushpull.game_logic.LevelManager;
+import com.jhsullivan.pushpull.game_objects.GameObject;
+import com.jhsullivan.pushpull.game_objects.Player;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -47,8 +52,7 @@ public class PlayActivity extends AppCompatActivity {
     LevelView levelView;
     LevelManager levelManager;
     InputController inputController;
-
-
+    private int clickAnimSpeed = 100;
 
     public static final String[] winMessages = {"Success!", "Brilliant!", "Marvelous!",
                                                 "Excellent!", "Well done!", "Fantastic!",
@@ -58,8 +62,11 @@ public class PlayActivity extends AppCompatActivity {
     private int winMessageIndex = winMessages.length;
     private boolean soundOn = true;
     static final int LEVEL_SELECT_RID = 278;
-
+    private Animation clickAnimation = new ScaleAnimation(1f, 1.1f,
+            1f, 1.1f, 100, 100);
     public static Resources resourceAccess;
+
+
 
 
     /**
@@ -73,11 +80,19 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         resourceAccess = getResources();
         setContentView(R.layout.activity_play);
-
         levelView = findViewById(R.id.levelView);
         inputController = findViewById(R.id.inputController);
         Intent intent = getIntent();
+        clickAnimation.setDuration(clickAnimSpeed);
 
+        int buttonWidth = findViewById(R.id.soundButton).getWidth();
+        int buttonHeight = findViewById(R.id.soundButton).getHeight();
+
+        clickAnimation = new ScaleAnimation(1f, 1.1f,
+                1f, 1.1f, buttonWidth * 2, buttonHeight * 2);
+
+
+        int pivot = 100;
 
         try {
             levelManager = new LevelManager(this);
@@ -87,6 +102,7 @@ public class PlayActivity extends AppCompatActivity {
             }
             else {
                 int currentLevelIndex = intent.getIntExtra(ActivityUtility.currentLevelID, -1);
+
 
                 if (currentLevelIndex == -1) {
                     ActivityUtility.showAlert("Level Error", "An error occurred " +
@@ -265,37 +281,42 @@ public class PlayActivity extends AppCompatActivity {
      * Enables the use of the buttons on the activity.
      */
     private void enableButtons() {
-        ImageButton skipButton = findViewById(R.id.undo);
+        final ImageButton skipButton = findViewById(R.id.undo);
         skipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                skipButton.startAnimation(clickAnimation);
                 undo();
             }
         });
 
-        ImageButton resetButton = findViewById(R.id.reset);
+        final ImageButton resetButton = findViewById(R.id.reset);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                resetButton.startAnimation(clickAnimation);
                 resetLevel();
             }
         });
 
-        ImageButton levelSelect = findViewById(R.id.levelSelect);
+        final ImageButton levelSelect = findViewById(R.id.levelSelect);
         levelSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                levelSelect.startAnimation(clickAnimation);
                 openLevelSelect();
             }
         });
 
-        ImageButton soundButton = findViewById(R.id.soundButton);
+        final ImageButton soundButton = findViewById(R.id.soundButton);
         soundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                soundButton.startAnimation(clickAnimation);
                 toggleSound();
             }
         });
+
     }
 
     /**

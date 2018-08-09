@@ -1,4 +1,4 @@
-package com.example.pushpull.game_logic;
+package com.jhsullivan.pushpull.game_logic;
 
 
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.example.pushpull.game_logic;
+package com.jhsullivan.pushpull.game_logic;
 
 /**
  * A custom Exception which is used to indicate a problem loading a level.

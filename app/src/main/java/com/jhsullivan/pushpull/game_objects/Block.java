@@ -1,12 +1,15 @@
-package com.example.pushpull.game_objects;
+package com.jhsullivan.pushpull.game_objects;
 
 
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 
-import com.example.pushpull.game_logic.Vector2D;
-import com.example.pushpull.user_interface.ColorHelper;
-import com.example.pushpull.user_interface.DrawingHelper;
-import com.example.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.user_interface.ColorHelper;
+import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+import com.jhsullivan.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 /**
  * A concrete implementation of GameObject, which is to be moved around by the player and put
@@ -18,6 +21,8 @@ public class Block implements GameObject{
     private int color = ColorHelper.getBlockColor();
     private Vector2D location;
     private boolean move = true;
+    private static Drawable blockIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.block);
+
 
 
     /**

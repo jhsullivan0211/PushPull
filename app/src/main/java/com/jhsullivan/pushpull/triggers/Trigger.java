@@ -1,8 +1,8 @@
-package com.example.pushpull.triggers;
+package com.jhsullivan.pushpull.triggers;
 
 
-import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.game_objects.GameObject;
+import com.jhsullivan.pushpull.game_logic.Actor;
+import com.jhsullivan.pushpull.game_objects.GameObject;
 
 
 /***

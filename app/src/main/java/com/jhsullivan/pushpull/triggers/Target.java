@@ -1,15 +1,16 @@
-package com.example.pushpull.triggers;
+package com.jhsullivan.pushpull.triggers;
 
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 
-import com.example.pushpull.R;
-import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.game_objects.Player;
-import com.example.pushpull.game_logic.Vector2D;
-import com.example.pushpull.user_interface.DrawingHelper;
-import com.example.pushpull.user_interface.LevelView;
-import com.example.pushpull.user_interface.PlayActivity;
+import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Level;
+import com.jhsullivan.pushpull.game_objects.GameObject;
+import com.jhsullivan.pushpull.game_objects.Player;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+import com.jhsullivan.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 /**
  * Represents the target that must be covered with a block to win.
@@ -18,6 +19,7 @@ public class Target implements Trigger {
 
     private Level level;
     private Vector2D location;
+    private static Drawable icon = PlayActivity.resourceAccess.getDrawable(R.drawable.target_icon);
 
     /**
      * Constructor for Target.
@@ -78,8 +80,7 @@ public class Target implements Trigger {
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(PlayActivity.resourceAccess.getDrawable(R.drawable.target_icon),
-                                location);
+        drawingHelper.drawIcon(icon, location);
     }
 
     /**

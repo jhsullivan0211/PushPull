@@ -1,8 +1,8 @@
-package com.example.pushpull.game_objects;
+package com.jhsullivan.pushpull.game_objects;
 
 
-import com.example.pushpull.game_logic.Actor;
-import com.example.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.game_logic.Actor;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
 
 
 /***

@@ -1,12 +1,13 @@
-package com.example.pushpull.game_objects;
+package com.jhsullivan.pushpull.game_objects;
 
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import com.example.pushpull.game_logic.Vector2D;
-import com.example.pushpull.user_interface.DrawingHelper;
-import com.example.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.user_interface.ColorHelper;
+import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+import com.jhsullivan.pushpull.user_interface.LevelView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 public class Wall implements GameObject{
 
 
-    private int color = Color.DKGRAY;
+    private int color = ColorHelper.getWallColor();
     private Vector2D location;
     private List<Wall> walls = new ArrayList<>();
 

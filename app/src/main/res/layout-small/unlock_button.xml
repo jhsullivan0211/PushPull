@@ -7,11 +7,10 @@
 
     <Button
         android:id="@+id/unlockButton"
-        android:layout_width="90dp"
-        android:layout_height="50dp"
-        android:fontFamily="@font/gfhaldanormal"
+        android:layout_width="55dp"
+        android:layout_height="40dp"
         android:text="Button"
-        android:textSize="24sp"
+        android:textSize="14sp"
         tools:layout_editor_absoluteX="133dp"
         tools:layout_editor_absoluteY="239dp" />
 </android.support.constraint.ConstraintLayout>

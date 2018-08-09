@@ -1,4 +1,4 @@
-package com.example.pushpull.game_objects;
+package com.jhsullivan.pushpull.game_objects;
 
 
 
@@ -6,10 +6,10 @@ package com.example.pushpull.game_objects;
     import android.graphics.Canvas;
 
 
-    import com.example.pushpull.game_logic.Vector2D;
-    import com.example.pushpull.user_interface.ColorHelper;
-    import com.example.pushpull.user_interface.DrawingHelper;
-    import com.example.pushpull.user_interface.LevelView;
+    import com.jhsullivan.pushpull.game_logic.Vector2D;
+    import com.jhsullivan.pushpull.user_interface.ColorHelper;
+    import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+    import com.jhsullivan.pushpull.user_interface.LevelView;
 
     import java.util.ArrayList;
     import java.util.Collections;

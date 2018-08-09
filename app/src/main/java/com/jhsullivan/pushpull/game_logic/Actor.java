@@ -1,8 +1,8 @@
-package com.example.pushpull.game_logic;
+package com.jhsullivan.pushpull.game_logic;
 
 import android.graphics.Canvas;
 
-import com.example.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.user_interface.LevelView;
 
 import java.io.Serializable;
 

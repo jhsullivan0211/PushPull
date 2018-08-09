@@ -1,18 +1,23 @@
-package com.example.pushpull.user_interface;
+package com.jhsullivan.pushpull.user_interface;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.example.pushpull.R;
+import com.jhsullivan.pushpull.R;
 
+/**
+ * The Activity displayed after the user beats the final level.  Displays a message, and allows
+ * the user to close the program.
+ */
 public class VictoryActivity extends AppCompatActivity {
 
-
-
+    /**
+     * The method called when this Activity is created.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +33,9 @@ public class VictoryActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Closes the app.
+     */
     private void closeGame() {
         Intent closingIntent = new Intent(this, StartupActivity.class);
         closingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -1,15 +1,20 @@
-package com.example.pushpull.triggers;
+package com.jhsullivan.pushpull.triggers;
 
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 
-import com.example.pushpull.game_logic.Level;
-import com.example.pushpull.game_objects.GameObject;
-import com.example.pushpull.game_objects.Player;
-import com.example.pushpull.game_logic.Vector2D;
-import com.example.pushpull.user_interface.ColorHelper;
-import com.example.pushpull.user_interface.DrawingHelper;
-import com.example.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Level;
+import com.jhsullivan.pushpull.game_objects.GameObject;
+import com.jhsullivan.pushpull.game_objects.Player;
+import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.user_interface.ColorHelper;
+import com.jhsullivan.pushpull.user_interface.DrawingHelper;
+import com.jhsullivan.pushpull.user_interface.LevelView;
+import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 /**
  * Transformer trigger, which transforms any player that moves onto it into the type of this
@@ -21,6 +26,13 @@ public class Transformer implements Trigger {
     private Player.Type type;
     private Level level;
     private Vector2D location;
+
+    private static Drawable grabIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.grab_transformer_small);
+    private static Drawable pullIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.pull_transformer_small);
+    private static Drawable pushIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.push_transformer_small);
+
+
+
 
     /**
      * Basic constructor for the Transformer class.  The type and location are immutable,
@@ -101,7 +113,23 @@ public class Transformer implements Trigger {
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        int color = 0;
+
+
+//        Drawable drawIcon = grabIcon;
+//        switch (type) {
+//            case PULL:
+//                drawIcon = pullIcon;
+//                break;
+//            case PUSH:
+//                drawIcon = pushIcon;
+//                break;
+//            case GRABALL:
+//                drawIcon = grabIcon;
+//                break;
+//        }
+//        drawingHelper.drawIcon(drawIcon, location);
+
+        int color = ColorHelper.getPushColor();
         switch (type) {
             case PULL:
                 color = ColorHelper.getPullColor();
@@ -113,7 +141,6 @@ public class Transformer implements Trigger {
                 color = ColorHelper.getGrabAllColor();
                 break;
         }
-
         drawingHelper.drawCircleBody(color, location);
 
     }

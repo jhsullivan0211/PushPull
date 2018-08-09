@@ -1,14 +1,15 @@
-package com.example.pushpull.game_logic;
+package com.jhsullivan.pushpull.game_logic;
 
 
-    import com.example.pushpull.game_objects.Block;
-    import com.example.pushpull.game_objects.BlockCluster;
-    import com.example.pushpull.game_objects.GameObject;
-    import com.example.pushpull.game_objects.Player;
-    import com.example.pushpull.game_objects.Wall;
-    import com.example.pushpull.triggers.Target;
-    import com.example.pushpull.triggers.Transformer;
-    import com.example.pushpull.triggers.Trigger;
+    import com.jhsullivan.pushpull.game_objects.Block;
+    import com.jhsullivan.pushpull.game_objects.BlockCluster;
+    import com.jhsullivan.pushpull.game_objects.GameObject;
+    import com.jhsullivan.pushpull.game_objects.Player;
+    import com.jhsullivan.pushpull.game_objects.Wall;
+    import com.jhsullivan.pushpull.triggers.Target;
+    import com.jhsullivan.pushpull.triggers.Transformer;
+    import com.jhsullivan.pushpull.triggers.Trigger;
+
     import java.util.ArrayList;
     import java.util.Collection;
     import java.util.Collections;
