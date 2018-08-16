@@ -33,6 +33,24 @@ public class Wall implements GameObject{
     }
 
     /**
+     * Checks for an adjacent wall in the specified direction.
+     *
+     * @param direction     The direction in which to check for another wall.
+     * @return              Returns a boolean indicating the presence of another wall in the
+     *                      specified direction.
+     */
+    private boolean hasAdjacentWall(Vector2D.Direction direction) {
+        Vector2D pointInDirection = getLocation().getPointInDirection(direction);
+        for (Wall wall : walls) {
+            if (wall.getLocation().equals(pointInDirection)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return  Returns this wall's location.
      */
     @Override
@@ -59,7 +77,6 @@ public class Wall implements GameObject{
         }
         drawingHelper.drawBorders(borderDirections, location);
     }
-
 
     /**
      * Sets the location of this Well.  Should only be used once, but this is not enforced.
@@ -91,22 +108,28 @@ public class Wall implements GameObject{
     }
 
     /**
-     * Checks for an adjacent wall in the specified direction.
      *
-     * @param direction     The direction in which to check for another wall.
-     * @return              Returns a boolean indicating the presence of another wall in the
-     *                      specified direction.
+     * @return  Returns the Wall's location, since it never moves.
      */
-    private boolean hasAdjacentWall(Vector2D.Direction direction) {
-        Vector2D pointInDirection = getLocation().getPointInDirection(direction);
-        for (Wall wall : walls) {
-            if (wall.getLocation().equals(pointInDirection)) {
-                return true;
-            }
-        }
-
-        return false;
+    @Override
+    public Vector2D getUndoLocation() {
+        return this.location;
     }
+
+    /**
+     * Does nothing, since the wall never moves and doesn't have an undo location.
+     *
+     * @param undoLocation N/A
+     */
+    @Override
+    public void setUndoLocation(Vector2D undoLocation) {
+
+    }
+
+
+
+
+
 
 
 

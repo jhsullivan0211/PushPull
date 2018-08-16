@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
@@ -64,9 +65,8 @@ public class PlayActivity extends AppCompatActivity {
     static final int LEVEL_SELECT_RID = 278;
     private Animation clickAnimation = new ScaleAnimation(1f, 1.1f,
             1f, 1.1f, 100, 100);
+
     public static Resources resourceAccess;
-
-
 
 
     /**
@@ -90,9 +90,6 @@ public class PlayActivity extends AppCompatActivity {
 
         clickAnimation = new ScaleAnimation(1f, 1.1f,
                 1f, 1.1f, buttonWidth * 2, buttonHeight * 2);
-
-
-        int pivot = 100;
 
         try {
             levelManager = new LevelManager(this);
@@ -136,18 +133,8 @@ public class PlayActivity extends AppCompatActivity {
 
         Level level = levelManager.getCurrentLevel();
         Serializable currentSerial = savedInstanceState.getSerializable(ActivityUtility.gameStateID);
-        Serializable undoLocSerial = savedInstanceState.getSerializable(ActivityUtility.undoPositionID);
-        Serializable undoTypeSerial = savedInstanceState.getSerializable(ActivityUtility.undoTypeID);
-
-        HashMap<Vector2D, GameObject> currentGameState;
-        HashMap<Vector2D, GameObject> undoLocationState;
-        HashMap<Player, Player.Type> undoTypeState;
-
-        currentGameState = (HashMap<Vector2D, GameObject>) currentSerial;
-        undoLocationState = (HashMap<Vector2D, GameObject>) undoLocSerial;
-        undoTypeState = (HashMap<Player, Player.Type>) undoTypeSerial;
-
-        level.loadState(currentGameState, undoLocationState, undoTypeState);
+        List<GameObject> currentGameState = (List<GameObject>) currentSerial;
+        level.unpackGameObjects(currentGameState);
     }
 
     /**
@@ -162,9 +149,8 @@ public class PlayActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
 
         Level level = levelManager.getCurrentLevel();
-        savedInstanceState.putSerializable(ActivityUtility.gameStateID, level.getCurrentState());
-        savedInstanceState.putSerializable(ActivityUtility.undoPositionID, level.getUndoLocationState());
-        savedInstanceState.putSerializable(ActivityUtility.undoTypeID, level.getUndoTypeState());
+        Serializable gameObjects = (Serializable) level.getGameObjects();
+        savedInstanceState.putSerializable(ActivityUtility.gameStateID, gameObjects);
         savedInstanceState.putInt(ActivityUtility.currentLevelID, levelManager.getLevelIndex());
     }
 
@@ -172,6 +158,7 @@ public class PlayActivity extends AppCompatActivity {
      * Resets the current level, called in response to the restart button being pressed.
      */
     public void resetLevel() {
+
 
         try {
             levelManager.reset();
@@ -316,7 +303,6 @@ public class PlayActivity extends AppCompatActivity {
                 toggleSound();
             }
         });
-
     }
 
     /**
@@ -339,6 +325,12 @@ public class PlayActivity extends AppCompatActivity {
      * being on and sound being off, updating the button graphic accordingly.
      */
     public void toggleSound() {
+
+        //debug - TODO: remove this
+
+        loadLevel(34);
+        //end
+
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {
             soundButton.setImageResource(R.drawable.sound_off_icon);
@@ -347,6 +339,8 @@ public class PlayActivity extends AppCompatActivity {
             soundButton.setImageResource(R.drawable.sound_on_icon);
         }
         soundOn = !soundOn;
+
+
     }
 
 

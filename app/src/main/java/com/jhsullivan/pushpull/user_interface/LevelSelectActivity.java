@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class LevelSelectActivity extends AppCompatActivity {
     private float buttonHeightRatio = 50f/70f;
     private int gridWidth;
 
+    //debug
+    private ImageButton templateButton;
 
     /**
      * Called when this activity is created.  Accesses and caches necessary data, and dynamically
@@ -52,12 +55,13 @@ public class LevelSelectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_level_select);
 
-
         myIntent = getIntent();
         levelCount = myIntent.getIntExtra(ActivityUtility.levelCountID, 0);
         currentLevelIndex = myIntent.getIntExtra(ActivityUtility.currentLevelID, -1);
         SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
         maxLevel = preferences.getInt(ActivityUtility.maxLevelID, -1);
+
+
 
         if (levelCount == 0 || maxLevel == -1) {
             ActivityUtility.showAlert("Level Error", "An error occurred while " +
@@ -79,8 +83,6 @@ public class LevelSelectActivity extends AppCompatActivity {
                 gridView.setAdapter(adapter);
             }
         });
-
-
     }
 
     /**
@@ -107,10 +109,10 @@ public class LevelSelectActivity extends AppCompatActivity {
                 if (levelIndex > maxLevel) {
                     View buttonLayout = LayoutInflater
                                         .from(context).inflate(R.layout.lock_button, null);
-
-
                     ImageButton button = buttonLayout.findViewById(R.id.lockButton);
                     formatButton(button);
+
+
                     return button;
 
                 }
@@ -138,6 +140,12 @@ public class LevelSelectActivity extends AppCompatActivity {
         return adapter;
     }
 
+    /**
+     * Changes the width and height of a specified button to fit the screen when packed into a
+     * GridView.
+     *
+     * @param button    The button to format.
+     */
     private void formatButton(View button) {
         int width = gridWidth / columns;
         int height = (int) (width * buttonHeightRatio);
@@ -160,10 +168,5 @@ public class LevelSelectActivity extends AppCompatActivity {
         }
 
         finish();
-
     }
-
-
-
-
 }

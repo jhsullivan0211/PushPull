@@ -38,10 +38,15 @@ public class LevelView extends View {
     private Level level;
     private Paint paint = new Paint(backgroundColor);
     private int gridLength;
+    private int actorUnit;
     private int size;
     private int radius;
+    private int marginX;
+    private int marginY;
+
     public Drawable targetIcon;
     public int radiusFactor = 205;
+
 
     /**
      * Basic constructor to use when creating this View from code.
@@ -86,22 +91,28 @@ public class LevelView extends View {
      *
      * @param context   The context of this View, usually an Activity.
      */
-    private void init(Context context) {
-
+    private void init(final Context context) {
         targetIcon = getResources().getDrawable(R.drawable.check);
         final Activity activity = (Activity) context;
+        this.setWillNotDraw(false);
+    }
 
-        final LevelView currentView = this;
-        this.post(new Runnable() {
-            @Override
-            public void run() {
-                size = currentView.getSize();
-                radius = size / radiusFactor;
-                int margin = (activity.getWindow().getDecorView().getWidth() - size) / 2;
-                currentView.setX(margin);
-
-            }
-        });
+    /**
+     * Called when the size of the View changes.
+     *
+     * @param w     The new width of the View.
+     * @param h     The new height of the View.
+     * @param oldw  The old width of the View.
+     * @param oldh  The old height of the View.
+     */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        size = this.getSize();
+        radius = size / radiusFactor;
+        actorUnit = size / gridLength;
+        marginX = (this.getWidth() - size) / 2;
+        marginY = (this.getHeight() - size) / 2;
     }
 
     /**
@@ -114,7 +125,6 @@ public class LevelView extends View {
         this.gridLength = level.getGridLength();
         invalidate();
     }
-
 
     /**
      * The method called to draw the View.  Draws the background, the grid (small circles that
@@ -130,7 +140,7 @@ public class LevelView extends View {
         }
 
         paint.setColor(backgroundColor);
-        canvas.drawRect(0, 0, size, size, paint);
+        canvas.drawRect(marginX, marginY, marginX + size, marginY + size, paint);
         drawGrid(canvas);
 
         for (Trigger trigger : level.getTriggers()) {
@@ -155,12 +165,12 @@ public class LevelView extends View {
      */
     private void drawGrid(Canvas canvas) {
         Paint gridPaint = new Paint();
-        gridPaint.setARGB(15, 0, 59, 70);
+        gridPaint.setARGB(25, 0, 59, 70);
 
         for (int i = 0; i < 10; i += 1) {
             for (int j = 0; j < 10; j += 1) {
-                int x = i * getActorUnit() + getActorUnit() / 2;
-                int y = j * getActorUnit() + getActorUnit() / 2;
+                int x = (i * getActorUnit() + getActorUnit() / 2) + marginX;
+                int y = (j * getActorUnit() + getActorUnit() / 2) + marginY;
 
                 canvas.drawCircle(x, y, radius, gridPaint);
             }
@@ -176,18 +186,11 @@ public class LevelView extends View {
     }
 
     /**
-     * @return  Returns the margin size.
-     */
-    private int getMargin() {
-        return getSize() / marginDivisorFactor;
-    }
-
-    /**
      *
      * @return  Returns an actor unit, which is just the width of the max size of a game entity.
      */
     public int getActorUnit() {
-        return ((getSize() - (2 * getMargin())) / gridLength);
+        return actorUnit;
     }
 
     /**
@@ -198,8 +201,8 @@ public class LevelView extends View {
      * @return  Returns a Vector2D converted to screen distance.
      */
     public Vector2D getScreenVector(Vector2D inputVector) {
-        int x = inputVector.getX() * getActorUnit() + getMargin();
-        int y = inputVector.getY() * getActorUnit() + getMargin();
+        int x = inputVector.getX() * getActorUnit() + marginX;
+        int y = inputVector.getY() * getActorUnit() + marginY;
         return new Vector2D(x, y);
     }
 

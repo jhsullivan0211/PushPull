@@ -15,14 +15,13 @@ import com.jhsullivan.pushpull.user_interface.PlayActivity;
  * A concrete implementation of GameObject, which is to be moved around by the player and put
  * onto the targets to win.
  */
-public class Block implements GameObject{
+public class Block implements GameObject {
 
 
     private int color = ColorHelper.getBlockColor();
     private Vector2D location;
     private boolean move = true;
-    private static Drawable blockIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.block);
-
+    private Vector2D undoLocation;
 
 
     /**
@@ -75,7 +74,25 @@ public class Block implements GameObject{
         return move;
     }
 
+    /**
+     *
+     * @return  Returns the previous location of this game object, where it will go if the undo
+     * action is performed.
+     */
+    @Override
+    public Vector2D getUndoLocation() {
+        return this.undoLocation;
+    }
 
 
+    /**
+     * Sets the value of the undoLocation field.
+     *
+     * @param undoLocation The location to which to set the undo location.
+     */
+    @Override
+    public void setUndoLocation(Vector2D undoLocation) {
+        this.undoLocation = undoLocation;
+    }
 
 }

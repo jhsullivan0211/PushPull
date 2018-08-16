@@ -9,6 +9,7 @@
         android:id="@+id/unlockButton"
         android:layout_width="55dp"
         android:layout_height="40dp"
+        android:fontFamily="@font/message"
         android:text="Button"
         android:textSize="14sp"
         tools:layout_editor_absoluteX="133dp"

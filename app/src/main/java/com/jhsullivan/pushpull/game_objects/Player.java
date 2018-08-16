@@ -3,6 +3,7 @@ package com.jhsullivan.pushpull.game_objects;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
@@ -26,7 +27,6 @@ import java.util.Set;
  */
 public class Player implements GameObject{
 
-
     public enum Type {PUSH, PULL, GRABALL};
 
     private Type type;
@@ -34,6 +34,8 @@ public class Player implements GameObject{
     private Vector2D location;
     private boolean move = true;
 
+    private Player.Type previousType;
+    private Vector2D undoLocation;
 
     /**
      * Constructor for the Player object.
@@ -42,6 +44,7 @@ public class Player implements GameObject{
      */
     public Player(Type type) {
         changeType(type);
+
     }
 
     /**
@@ -51,7 +54,6 @@ public class Player implements GameObject{
      */
     public void changeType(Type type) {
         this.type = type;
-
     }
 
     /**
@@ -188,6 +190,14 @@ public class Player implements GameObject{
         list.add(obj);
     }
 
+    public Player.Type getPreviousType() {
+        return this.previousType;
+    }
+
+    public void setPreviousType(Player.Type previousType) {
+        this.previousType = previousType;
+    }
+
     /**
      * Method to draw the player.
      *
@@ -241,6 +251,27 @@ public class Player implements GameObject{
     public boolean canMove() {
         return move;
     }
+
+    /**
+     *
+     * @return  Returns the previous location of this game object, where it will go if the undo
+     * action is performed.
+     */
+    @Override
+    public Vector2D getUndoLocation() {
+        return this.undoLocation;
+    }
+
+    /**
+     * Sets the value of the undoLocation field.
+     *
+     * @param undoLocation The location to which to set the undo location.
+     */
+    @Override
+    public void setUndoLocation(Vector2D undoLocation) {
+        this.undoLocation = undoLocation;
+    }
+
 
 
 }

@@ -1,6 +1,8 @@
 package com.jhsullivan.pushpull.game_logic;
 
 
+    import android.util.Log;
+
     import com.jhsullivan.pushpull.game_objects.Block;
     import com.jhsullivan.pushpull.game_objects.BlockCluster;
     import com.jhsullivan.pushpull.game_objects.GameObject;
@@ -51,7 +53,7 @@ public class Level {
     private final String layout;
 
 
-    private List<GameObject> gameObjects = new ArrayList<>();
+    private ArrayList<GameObject> gameObjects = new ArrayList<>();
 
     private List<Player> players = new ArrayList<>();
     private List<Trigger> triggers = new ArrayList<>();
@@ -59,10 +61,8 @@ public class Level {
     private List<Target> targets = new ArrayList<>();
     private Map<String, List<BlockCluster>> clusterGroups = new HashMap<>();
 
-
-    private Map<Player, Player.Type> typeState = new HashMap<>();
     private Map<Vector2D, GameObject> filledPositions = new HashMap<>();
-    private Map<Vector2D, GameObject> gameState = new HashMap<>();
+
 
     private boolean isComplete = false;
     private boolean finishedLoading = false;
@@ -115,8 +115,6 @@ public class Level {
                continue;
            }
 
-
-
            int y = position / rowNumber;
            int x = position % columnNumber;
 
@@ -137,32 +135,19 @@ public class Level {
         for (Wall wall : walls) {
            wall.groupWalls(walls);
         }
+
+        for (GameObject obj : gameObjects) {
+            obj.setUndoLocation(obj.getLocation());
+        }
+
+        for (Player player : players) {
+            player.setPreviousType(player.getType());
+        }
         message = messageBuilder.toString();
         updateClusters();
-        captureState(gameState, typeState);
         update();
     }
 
-    /**
-     * Captures the current state (positions of game objects and types of players) and
-     * stores it in the two specified maps.
-     *
-     * @param state     Map representing the positions of each game object.
-     * @param type      Map representing the type of each player.
-     */
-
-    private void captureState(Map<Vector2D, GameObject> state,
-                              Map<Player, Player.Type> type) {
-
-        for (Vector2D position : filledPositions.keySet()) {
-            GameObject obj = filledPositions.get(position);
-            state.put(position, obj);
-        }
-
-        for (Player pawn : players) {
-            type.put(pawn, pawn.getType());
-        }
-    }
 
 
     /**
@@ -185,7 +170,6 @@ public class Level {
         else if (id.equals("w")) {
             Wall wall = new Wall();
             spawnGameObject(wall, location);
-            walls.add(wall);
             return 1;
         }
 
@@ -205,7 +189,6 @@ public class Level {
 
             BlockCluster spawned = new BlockCluster(idChar);
             spawnGameObject(spawned, location);
-            addCluster(spawned);
             return 1;
         }
 
@@ -213,11 +196,9 @@ public class Level {
             Player.Type spawnType = Player.idToType(idChar);
             Player spawnPlayer = new Player(spawnType);
             spawnGameObject(spawnPlayer, location);
-            players.add(spawnPlayer);
             return 1;
-
-
         }
+
         else if (id.equals("x")) {
             return 0;
         }
@@ -227,7 +208,11 @@ public class Level {
         }
     }
 
-
+    /**
+     * Adds a given cluster to the clusterGroups map.
+     *
+     * @param cluster   The cluster to add.
+     */
     private void addCluster(BlockCluster cluster) {
         String id = cluster.getClusterID().toString();
         if (!clusterGroups.containsKey(id)) {
@@ -236,58 +221,45 @@ public class Level {
         clusterGroups.get(id).add(cluster);
     }
 
+    /**
+     * Unpacks a collection of game objects, i.e. clears the level and  puts all of the game
+     * objects in the specified collection into their location on the Level.
+     *
+     * @param objects The Game Objects to unpack
+
+     */
+    public void unpackGameObjects(Collection<GameObject> objects) {
+
+        clearGameObjects();
+        for (GameObject piece : objects) {
+            spawnGameObject(piece, piece.getLocation());
+        }
+    }
 
     /**
-     * Reverts to the previously saved state defined by game object positions.
+     * Performs the 'undo' feature of the game, i.e. puts every piece back to where it was before
+     * the last move, and reverts any just-changed types back to their previous state.
      */
     void revertState() {
 
-        if (gameState == null) {
-            return;
+        filledPositions.clear();
+        for (GameObject gameObject : gameObjects) {
+
+            gameObject.setLocation(gameObject.getUndoLocation());
+            filledPositions.put(gameObject.getLocation(), gameObject);
+
+            if (gameObject instanceof  Player) {
+                Player player = (Player) gameObject;
+                player.changeType(player.getPreviousType());
+            }
         }
 
-        for (Vector2D position : gameState.keySet()) {
-            GameObject obj = gameState.get(position);
-            obj.setLocation(position);
-
-        }
-
-        for (Player player : typeState.keySet()) {
-            player.changeType(typeState.get(player));
-        }
-        this.filledPositions = gameState;
-        update();
+       update();
     }
 
-    /**
-     *
-     * @return  Returns the current game state in serializable form.
-     */
-    public HashMap<Vector2D, GameObject> getCurrentState() {
-        return new HashMap<>(filledPositions);
+    public void print(String message) {
+        Log.d("PRINT", message);
     }
-
-    /**
-     *
-     * @return  Returns the location state for undo in serializable form.
-     */
-    public HashMap<Vector2D, GameObject> getUndoLocationState() {
-        return new HashMap<>(gameState);
-    }
-
-    /**
-     *
-     * @return      Returns a map of each player to its type, in serializable form.
-     */
-    public HashMap<Player, Player.Type> getUndoTypeState() {
-        return new HashMap<>(typeState);
-    }
-
-
-
-
-
-
 
     /**
      * Clears all game objects from the level.
@@ -333,6 +305,18 @@ public class Level {
         }
         filledPositions.put(spawnPoint, gameObject);
         gameObjects.add(gameObject);
+
+        if (gameObject instanceof Wall) {
+            walls.add(((Wall) gameObject));
+        }
+
+        if (gameObject instanceof BlockCluster) {
+            addCluster((BlockCluster) gameObject);
+        }
+
+        if (gameObject instanceof Player) {
+            players.add((Player) gameObject);
+        }
     }
 
 
@@ -355,6 +339,9 @@ public class Level {
         return adjacents;
     }
 
+    /**
+     * Updates the collection of stored BlockClusters contained by each cluster.
+     */
     private void updateClusters() {
         for (List<BlockCluster> clusterList : clusterGroups.values()) {
             for (BlockCluster cluster : clusterList) {
@@ -363,53 +350,29 @@ public class Level {
         }
     }
 
-    public void loadState(Map<Vector2D, GameObject> currentState,
-                          Map<Vector2D, GameObject> undoPositionState,
-                          Map<Player, Player.Type> undoTypeState) {
-
-        clearGameObjects();
-        filledPositions = currentState;
-        gameObjects = new ArrayList<>(filledPositions.values());
-
-        for (Vector2D position : filledPositions.keySet()) {
-            GameObject obj = filledPositions.get(position);
-
-            if (obj instanceof Player) {
-                players.add(((Player) obj));
-            }
-
-            if (obj instanceof Wall) {
-                walls.add(((Wall) obj));
-            }
-
-            if (obj instanceof BlockCluster) {
-                addCluster((BlockCluster) obj);
-            }
-        }
-
-
-        gameState = undoPositionState;
-        typeState = undoTypeState;
-
-
-    }
 
     /**
      * Applies input in a certain direction, i.e. attempts to move all of the
      * players in the level (and push/pull any blocks the players can).  Repeatedly
      * attempts to move each player until there is no longer any change occurring.
-     * Updates the current state (represented by the gameState and typeState maps)
-     * if a successful movement occurs.
-     *
+
       * @param moveDirection  The input direction.
      */
     public void processInput(Vector2D.Direction moveDirection) {
 
-        Map<Vector2D, GameObject> tempGameState = new HashMap<>();
-        Map<Player, Player.Type> tempTypeState = new HashMap<>();
-        captureState(tempGameState, tempTypeState);
 
+        //Store current locations and types.
+        Map<GameObject, Vector2D> currentLocations = new HashMap<>();
+        Map<Player, Player.Type> currentTypes = new HashMap<>();
+        for (GameObject obj : gameObjects) {
+            currentLocations.put(obj, obj.getLocation());
+        }
 
+        for (Player player : players) {
+            currentTypes.put(player, player.getType());
+        }
+
+        //Attempt moves
         List<Player> failures = new ArrayList<>();
         int count = players.size();
         while (failures.size() != count) {
@@ -418,10 +381,16 @@ public class Level {
             movePlayers(moveDirection, failures);
         }
 
-        if (moveFailures(moveDirection) || failures.size() < players.size()) {
-            gameState = tempGameState;
-            typeState = tempTypeState;
-        }
+        //If a move really occurs, update undo locations.
+       if (moveFailures(moveDirection) || failures.size() < players.size()) {
+           for (GameObject obj : gameObjects) {
+               obj.setUndoLocation(currentLocations.get(obj));
+           }
+
+           for (Player player : players) {
+               player.setPreviousType(currentTypes.get(player));
+           }
+       }
 
         update();
 
@@ -657,9 +626,5 @@ public class Level {
     public List<Target> getTargets() {
         return Collections.unmodifiableList(targets);
     }
-
-
-
-
 
 }

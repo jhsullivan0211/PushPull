@@ -27,12 +27,6 @@ public class Transformer implements Trigger {
     private Level level;
     private Vector2D location;
 
-    private static Drawable grabIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.grab_transformer_small);
-    private static Drawable pullIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.pull_transformer_small);
-    private static Drawable pushIcon = PlayActivity.resourceAccess.getDrawable(R.drawable.push_transformer_small);
-
-
-
 
     /**
      * Basic constructor for the Transformer class.  The type and location are immutable,
@@ -79,7 +73,7 @@ public class Transformer implements Trigger {
      */
     @Override
     public void act(GameObject filler) {
-        if (!filled && filler instanceof Player) {
+        if (filler instanceof Player) {
             Player player = (Player) filler;
             player.changeType(type);
         }

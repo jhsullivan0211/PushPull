@@ -20,7 +20,7 @@
         </activity>
         <activity
             android:name=".user_interface.PlayActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".user_interface.LevelSelectActivity"
             android:screenOrientation="portrait" />

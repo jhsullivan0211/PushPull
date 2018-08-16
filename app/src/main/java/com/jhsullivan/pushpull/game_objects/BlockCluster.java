@@ -27,6 +27,7 @@ public class BlockCluster implements GameObject{
     private List<BlockCluster> clusters = new ArrayList<>();
     private boolean move = true;
     private Character clusterID;
+    private Vector2D undoLocation;
 
     /**
      *  Basic constructor which takes in a clusterID to assign to this block.
@@ -143,8 +144,25 @@ public class BlockCluster implements GameObject{
         return false;
     }
 
+    /**
+     *
+     * @return  Returns the previous location of this game object, where it will go if the undo
+     * action is performed.
+     */
+    @Override
+    public Vector2D getUndoLocation() {
+        return this.undoLocation;
+    }
 
-
+    /**
+     * Sets the value of the undoLocation field.
+     *
+     * @param undoLocation The location to which to set the undo location.
+     */
+    @Override
+    public void setUndoLocation(Vector2D undoLocation) {
+        this.undoLocation = undoLocation;
+    }
 
 
 }
