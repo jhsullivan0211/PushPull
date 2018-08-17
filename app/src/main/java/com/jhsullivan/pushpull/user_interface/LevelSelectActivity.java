@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -39,8 +41,9 @@ public class LevelSelectActivity extends AppCompatActivity {
     private float buttonHeightRatio = 50f/70f;
     private int gridWidth;
 
-    //debug
-    private ImageButton templateButton;
+    private View unlockLayout;
+    private View lockLayout;
+
 
     /**
      * Called when this activity is created.  Accesses and caches necessary data, and dynamically
@@ -60,8 +63,6 @@ public class LevelSelectActivity extends AppCompatActivity {
         currentLevelIndex = myIntent.getIntExtra(ActivityUtility.currentLevelID, -1);
         SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
         maxLevel = preferences.getInt(ActivityUtility.maxLevelID, -1);
-
-
 
         if (levelCount == 0 || maxLevel == -1) {
             ActivityUtility.showAlert("Level Error", "An error occurred while " +
@@ -108,16 +109,15 @@ public class LevelSelectActivity extends AppCompatActivity {
 
                 if (levelIndex > maxLevel) {
                     View buttonLayout = LayoutInflater
-                                        .from(context).inflate(R.layout.lock_button, null);
+                                        .from(context).inflate(R.layout.lock_button, new LinearLayout(context));
                     ImageButton button = buttonLayout.findViewById(R.id.lockButton);
                     formatButton(button);
 
-
                     return button;
-
                 }
                 else {
-                    View buttonLayout = LayoutInflater.from(context).inflate(R.layout.unlock_button, null);
+                    View buttonLayout = LayoutInflater
+                                        .from(context).inflate(R.layout.unlock_button, new LinearLayout(context));
                     Button button = buttonLayout.findViewById(R.id.unlockButton);
                     button.setText(String.valueOf(levelIndex + 1));
 
@@ -149,7 +149,9 @@ public class LevelSelectActivity extends AppCompatActivity {
     private void formatButton(View button) {
         int width = gridWidth / columns;
         int height = (int) (width * buttonHeightRatio);
-        button.setLayoutParams(new LinearLayout.LayoutParams(width, height));
+        button.setLayoutParams(new AbsListView.LayoutParams(width, height));
+
+
     }
 
     /**

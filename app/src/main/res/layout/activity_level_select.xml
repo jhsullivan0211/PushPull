@@ -36,6 +36,7 @@
         android:fontFamily="monospace"
         android:text="\nLevel Select\n"
         android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
