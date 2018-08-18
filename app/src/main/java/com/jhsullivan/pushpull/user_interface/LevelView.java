@@ -19,6 +19,7 @@ import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.triggers.Target;
 import com.jhsullivan.pushpull.triggers.Trigger;
 

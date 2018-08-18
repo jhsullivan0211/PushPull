@@ -372,6 +372,8 @@ public class Level {
             currentTypes.put(player, player.getType());
         }
 
+        
+
         //Attempt moves
         List<Player> failures = new ArrayList<>();
         int count = players.size();
@@ -393,8 +395,8 @@ public class Level {
        }
 
         update();
-
     }
+
 
     /**
      * Attempts a single iteration of movement of all the players in a specified direction.
@@ -626,5 +628,8 @@ public class Level {
     public List<Target> getTargets() {
         return Collections.unmodifiableList(targets);
     }
+
+
+
 
 }

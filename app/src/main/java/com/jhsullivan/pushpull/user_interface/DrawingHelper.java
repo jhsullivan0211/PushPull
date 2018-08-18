@@ -3,6 +3,7 @@ package com.jhsullivan.pushpull.user_interface;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 
@@ -19,8 +20,6 @@ public class DrawingHelper {
     private enum Shape {CIRCLE, SQUARE};
     private int borderWidth;
     private int borderWidthFactor = 205;
-
-
     private LevelView levelView;
     private Canvas canvas;
 

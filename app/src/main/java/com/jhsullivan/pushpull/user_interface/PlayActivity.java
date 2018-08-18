@@ -388,6 +388,7 @@ public class PlayActivity extends AppCompatActivity {
         if (levelManager.checkVictory()) {
             activateWinEvent();
         }
+
         levelView.invalidate();
 
     }

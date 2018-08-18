@@ -21,7 +21,7 @@ public class InputController extends View implements GestureDetector.OnGestureLi
 
 
     private GestureDetectorCompat gestureDetector;
-    private static final int DISTANCE_THRESHOLD = 2;
+    private static final int DISTANCE_THRESHOLD = 12;
     private boolean enabled = true;
     private Context context;
 
