@@ -19,7 +19,6 @@ public class Target implements Trigger {
 
     private Level level;
     private Vector2D location;
-    private static Drawable icon = PlayActivity.resourceAccess.getDrawable(R.drawable.target_icon);
 
     /**
      * Constructor for Target.
@@ -80,7 +79,7 @@ public class Target implements Trigger {
     @Override
     public void draw(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(icon, location);
+        drawingHelper.drawIcon(levelView.targetIcon, location);
     }
 
     /**
@@ -91,7 +90,7 @@ public class Target implements Trigger {
      */
     public void drawSuccessIcon(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(levelView.targetIcon, location);
+        drawingHelper.drawIcon(levelView.coveredTargetIconn, location);
     }
 
 

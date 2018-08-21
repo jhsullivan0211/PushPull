@@ -294,7 +294,7 @@ public class Vector2D implements Serializable{
     public static Direction getClockwiseDirection(Direction direction, int numberOfRotations) {
 
         Direction current = direction;
-        for (int i = 0; i < numberOfRotations; i += 1) {
+        for (int i = 0; i < numberOfRotations; i++) {
             switch (current) {
                 case LEFT:
                     current = Direction.UP;

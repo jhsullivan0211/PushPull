@@ -52,7 +52,6 @@ public class Level {
     private final Vector2D levelBounds = new Vector2D(columnNumber - 1, rowNumber - 1);
     private final String layout;
 
-
     private ArrayList<GameObject> gameObjects = new ArrayList<>();
 
     private List<Player> players = new ArrayList<>();
@@ -80,6 +79,27 @@ public class Level {
         this.layout = layout;
         this.load(layout);
     }
+
+    /**
+     * Constructor which builds an empty level.
+     *
+     * @param   layout    The String defining the layout for this level.
+     */
+    public Level() throws LevelLoadException {
+        this.layout =   "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,\n" +
+                        "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";
+
+        this.load(layout);
+    }
+
 
     /**
      * Reads the specified String and adds game objects and triggers to the level.
@@ -589,6 +609,17 @@ public class Level {
      */
     public GameObject getObjectAt(Vector2D position) {
         return filledPositions.get(position);
+    }
+
+    /**
+     * Overloaded version of the above, which uses integer arguments instead of a Vector2D.
+     *
+     * @param x The x-coordinate of the position to check.
+     * @param y The y-coordinate of the position to check.
+     * @return  Returns the game object at the specified position.
+     */
+    public GameObject getObjectAt(int x, int y) {
+        return this.getObjectAt(new Vector2D(x, y));
     }
 
     /**

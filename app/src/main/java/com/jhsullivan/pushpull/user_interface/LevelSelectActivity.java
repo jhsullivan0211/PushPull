@@ -70,7 +70,7 @@ public class LevelSelectActivity extends AppCompatActivity {
         }
 
         final List<Integer> levels = new ArrayList<>();
-        for (int i = 0; i < levelCount; i += 1) {
+        for (int i = 0; i < levelCount; i++) {
             levels.add(i);
         }
 

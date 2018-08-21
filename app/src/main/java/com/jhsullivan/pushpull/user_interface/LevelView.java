@@ -3,23 +3,17 @@ package com.jhsullivan.pushpull.user_interface;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
-import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.triggers.Target;
 import com.jhsullivan.pushpull.triggers.Trigger;
 
@@ -45,6 +39,7 @@ public class LevelView extends View {
     private int marginX;
     private int marginY;
 
+    public Drawable coveredTargetIconn;
     public Drawable targetIcon;
     public int radiusFactor = 205;
 
@@ -93,7 +88,8 @@ public class LevelView extends View {
      * @param context   The context of this View, usually an Activity.
      */
     private void init(final Context context) {
-        targetIcon = getResources().getDrawable(R.drawable.check);
+        coveredTargetIconn = getResources().getDrawable(R.drawable.check);
+        targetIcon = getResources().getDrawable(R.drawable.target_icon);
         final Activity activity = (Activity) context;
         this.setWillNotDraw(false);
     }
@@ -168,8 +164,8 @@ public class LevelView extends View {
         Paint gridPaint = new Paint();
         gridPaint.setARGB(25, 0, 59, 70);
 
-        for (int i = 0; i < 10; i += 1) {
-            for (int j = 0; j < 10; j += 1) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 int x = (i * getActorUnit() + getActorUnit() / 2) + marginX;
                 int y = (j * getActorUnit() + getActorUnit() / 2) + marginY;
 
