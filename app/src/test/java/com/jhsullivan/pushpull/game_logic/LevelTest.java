@@ -358,18 +358,75 @@ public class LevelTest {
     public void testPullClusterBasic() throws LevelLoadException {
         //                   0  1  2  3  4  5  6  7  8  9
         String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
-                "xx,xx,xx,xx,1x,xx,xx,xx,xx,xx\n" + //3
-                "xx,xx,xx,xx,1x,qx,xx,xx,xx,xx\n" + //4
-                "xx,xx,xx,xx,1x,xx,xx,xx,xx,xx\n" + //5
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
-                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
+                            "xx,xx,xx,xx,1x,xx,xx,xx,xx,xx\n" + //3
+                            "xx,xx,xx,xx,1x,qx,xx,xx,xx,xx\n" + //4
+                            "xx,xx,xx,xx,1x,xx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
 
         Level testLevel = new Level(testLayout);
         List<GameObject> movers = getMovers(testLevel, new HashSet<>());
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
+        testLevel.processInput(Vector2D.Direction.RIGHT);
+        testGameObjectEndPoints(testLevel, resultMap);
+
+    }
+
+    /**
+     * Tests whether the PULL type player fails to move into a wall, even while pulling a block.
+     * Expected result: nothing moves.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testPullStoppedAtWall() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //3
+                            "xx,xx,xx,xx,bx,qx,wx,xx,xx,xx\n" + //4
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel);
+        testLevel.processInput(Vector2D.Direction.RIGHT);
+        testGameObjectEndPoints(testLevel, resultMap);
+    }
+
+    /**
+     * Tests whether the PULL type player can still move if it fails to pull the other block.
+     * Expected result:  Only the player moves to the right.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testPullDetachOnFail() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
+                            "xx,xx,xx,xx,1x,wx,xx,xx,xx,xx\n" + //3
+                            "xx,xx,xx,xx,1x,qx,xx,xx,xx,xx\n" + //4
+                            "xx,xx,xx,xx,1x,xx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        List<GameObject> movers = new ArrayList<>();
+        movers.add(testLevel.getObjectAt(5, 4));
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
@@ -390,7 +447,6 @@ public class LevelTest {
      * @param testLevel         The Level to act upon.
      * @param targetPositions   A map of game objects to positions, which indicates where each
      *                          game object should end up.
-     * @param message           The message to display on assertion errors.
      */
      private  void testGameObjectEndPoints(Level testLevel,
                                 Map<GameObject, Vector2D> targetPositions) {
