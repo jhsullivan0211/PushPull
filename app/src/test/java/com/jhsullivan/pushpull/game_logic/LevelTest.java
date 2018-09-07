@@ -40,8 +40,6 @@ public class LevelTest {
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
 
 
-
-
     /**
      * Tests whether a player can push a block.  Expected result:  both player and block move to
      * the right.

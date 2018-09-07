@@ -10,11 +10,9 @@ import android.media.MediaPlayer;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import com.jhsullivan.pushpull.R;
@@ -70,8 +68,8 @@ public class PlayActivity extends AppCompatActivity {
     private MediaPlayer restartSoundPlayer;
     private MediaPlayer undoSoundPlayer;
     private MediaPlayer successSoundPlayer;
-
     public static Resources resourceAccess;
+    private boolean canUndo = false;
 
 
     /**
@@ -90,8 +88,6 @@ public class PlayActivity extends AppCompatActivity {
         inputController = findViewById(R.id.inputController);
         Intent intent = getIntent();
         clickAnimation.setDuration(clickAnimSpeed);
-
-
 
         ImageButton soundButton = findViewById(R.id.soundButton);
         int buttonWidth = soundButton.getWidth();
@@ -138,8 +134,9 @@ public class PlayActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         restartSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
-        successSoundPlayer = MediaPlayer.create(context, R.raw.success_sound);
         undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+        undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+        successSoundPlayer = MediaPlayer.create(context, R.raw.success_sound);
     }
 
     /**
@@ -148,7 +145,6 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("STOPPING", "onStop: HERE");
         if (restartSoundPlayer != null) {
             restartSoundPlayer.release();
         }
@@ -202,9 +198,9 @@ public class PlayActivity extends AppCompatActivity {
      */
     public void resetLevel() {
 
-
         try {
             levelManager.reset();
+            canUndo = false;
         }
         catch (LevelLoadException e) {
             ActivityUtility.showAlert("Level Load Error", "There was an error "+
@@ -218,6 +214,7 @@ public class PlayActivity extends AppCompatActivity {
      * Reverts to the state immediately before the last move, called in response to the undo button.
      */
     public void undo() {
+        canUndo = false;
         levelManager.revertState();
         levelView.setLevel(levelManager.getCurrentLevel());
 
@@ -322,7 +319,7 @@ public class PlayActivity extends AppCompatActivity {
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (soundOn) {
+                if (soundOn && canUndo) {
                     undoSoundPlayer.start();
                 }
                 undoButton.startAnimation(clickAnimation);
@@ -346,6 +343,11 @@ public class PlayActivity extends AppCompatActivity {
         levelSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (soundOn) {
+                    undoSoundPlayer.start();
+                }
+
                 levelSelect.startAnimation(clickAnimation);
                 openLevelSelect();
             }
@@ -445,8 +447,9 @@ public class PlayActivity extends AppCompatActivity {
      * @param direction  The direction in which to apply movement.
      */
     public void handleInput(Vector2D.Direction direction) {
-
-        levelManager.getCurrentLevel().processInput(direction);
+        if (levelManager.getCurrentLevel().processInput(direction)) {
+            canUndo = true;
+        }
         if (levelManager.checkVictory()) {
             activateWinEvent();
         }

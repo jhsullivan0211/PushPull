@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ public class LevelSelectActivity extends AppCompatActivity {
     private int columns;
     private float buttonHeightRatio = 50f/70f;
     private int gridWidth;
+    private MediaPlayer buttonSelectSound;
 
     private View unlockLayout;
     private View lockLayout;
@@ -87,6 +89,27 @@ public class LevelSelectActivity extends AppCompatActivity {
     }
 
     /**
+     * Called when the activity starts (i.e. comes into view).
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        buttonSelectSound = MediaPlayer.create(this, R.raw.action_click);
+    }
+
+    /**
+     * Called when the activity is no longer in view.
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (buttonSelectSound != null) {
+            buttonSelectSound.release();
+        }
+
+    }
+
+    /**
      * Returns an ArrayAdapter which provides a method to the AdapterView to get the properly
      * formatted level button as a View.  This method chooses the format of the button based
      * on the level index (since the buttons display the level index), the current level (the
@@ -129,6 +152,7 @@ public class LevelSelectActivity extends AppCompatActivity {
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            buttonSelectSound.start();
                             setLevel(levelIndex);
                         }
                     });

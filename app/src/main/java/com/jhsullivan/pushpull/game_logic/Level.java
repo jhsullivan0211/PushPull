@@ -379,9 +379,10 @@ public class Level {
      * players in the level (and push/pull any blocks the players can).  Repeatedly
      * attempts to move each player until there is no longer any change occurring.
 
-      * @param moveDirection  The input direction.
+     * @param moveDirection  The input direction.
+     *  @return  Returns whether a movement actually occurred.
      */
-    public void processInput(Vector2D.Direction moveDirection) {
+    public boolean processInput(Vector2D.Direction moveDirection) {
 
 
         //Store current locations and types.
@@ -407,6 +408,7 @@ public class Level {
         }
 
         //If a move really occurs, update undo locations.
+        boolean didMove = false;
         if (moveFailures(moveDirection) || failures.size() < players.size()) {
             for (GameObject obj : gameObjects) {
                 obj.setUndoLocation(currentLocations.get(obj));
@@ -415,9 +417,12 @@ public class Level {
             for (Player player : players) {
                 player.setPreviousType(currentTypes.get(player));
             }
+            didMove = true;
+
         }
 
         update();
+        return didMove;
     }
 
 
