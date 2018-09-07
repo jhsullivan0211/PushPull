@@ -11,8 +11,18 @@
         android:id="@+id/unlockButton"
         android:layout_width="70dp"
         android:layout_height="50dp"
-        android:backgroundTint="@color/buttonColor"
+        android:background="@drawable/custom_button"
         android:textSize="16sp"
         tools:layout_editor_absoluteX="55dp"
         tools:layout_editor_absoluteY="57dp" />
+
+    <Button
+        android:id="@+id/unlockButtonAccented"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:background="@drawable/custom_button_highlighted"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="192dp"
+        tools:layout_editor_absoluteY="129dp" />
+
 </android.support.constraint.ConstraintLayout>

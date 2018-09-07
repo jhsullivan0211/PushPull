@@ -48,4 +48,6 @@ public interface GameObject extends Actor {
      * @param undoLocation The location to which to set the undo location.
      */
     public void setUndoLocation(Vector2D undoLocation);
+
+
 }

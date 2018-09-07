@@ -118,13 +118,13 @@ public class LevelSelectActivity extends AppCompatActivity {
                 else {
                     View buttonLayout = LayoutInflater
                                         .from(context).inflate(R.layout.unlock_button, new LinearLayout(context));
+
                     Button button = buttonLayout.findViewById(R.id.unlockButton);
+                    if (levelIndex == currentLevelIndex) {
+                        button = buttonLayout.findViewById(R.id.unlockButtonAccented);
+                    }
                     button.setText(String.valueOf(levelIndex + 1));
 
-                    if (levelIndex == currentLevelIndex) {
-                        button.getBackground().setColorFilter(Color.rgb(50, 205, 50),
-                                PorterDuff.Mode.MULTIPLY);
-                    }
 
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -147,8 +147,8 @@ public class LevelSelectActivity extends AppCompatActivity {
      * @param button    The button to format.
      */
     private void formatButton(View button) {
-        int width = gridWidth / columns;
-        int height = (int) (width * buttonHeightRatio);
+        int width = (int) ((gridWidth / columns) * 0.9);
+        int height = (int) (width * buttonHeightRatio * 0.9);
         button.setLayoutParams(new AbsListView.LayoutParams(width, height));
 
 

@@ -10,8 +10,9 @@
         android:id="@+id/lockButton"
         android:layout_width="71dp"
         android:layout_height="50dp"
-        android:backgroundTint="@color/buttonColor"
+        android:background="@drawable/custom_button"
         android:scaleType="fitCenter"
+        android:padding="6dp"
         app:srcCompat="@drawable/lock_icon"
         tools:layout_editor_absoluteX="152dp"
         tools:layout_editor_absoluteY="236dp" />

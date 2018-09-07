@@ -1,18 +1,14 @@
 package com.jhsullivan.pushpull.game_objects;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 
-import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.ColorHelper;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
 import com.jhsullivan.pushpull.user_interface.LevelView;
-import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -104,7 +100,7 @@ public class Player implements GameObject{
                 return level.moveGroup(movers, direction);
 
             case GRABALL:
-                movers.addAll(getAllAttached(this, level));
+                movers.addAll(getContiguousObjects(this, level));
                 return level.moveGroup(movers, direction);
         }
 
@@ -119,7 +115,7 @@ public class Player implements GameObject{
      * @param level     The Level to query for attached objects.
      * @return          Returns a collection of game objects attached to the supplied GameObject.
      */
-    public Collection<GameObject> getAllAttached(GameObject target, Level level) {
+    public Collection<GameObject> getContiguousObjects(GameObject target, Level level) {
 
         Set<GameObject> attached = new HashSet<>();
         Set<GameObject> next = new HashSet<>();
@@ -271,7 +267,5 @@ public class Player implements GameObject{
     public void setUndoLocation(Vector2D undoLocation) {
         this.undoLocation = undoLocation;
     }
-
-
 
 }

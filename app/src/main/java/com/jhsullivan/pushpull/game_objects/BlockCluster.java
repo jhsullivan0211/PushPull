@@ -21,7 +21,6 @@ package com.jhsullivan.pushpull.game_objects;
  */
 public class BlockCluster implements GameObject{
 
-
     private int color = ColorHelper.getClusterColor();
     private Vector2D location;
     private List<BlockCluster> clusters = new ArrayList<>();
@@ -79,7 +78,6 @@ public class BlockCluster implements GameObject{
 
         drawingHelper.drawBorders(borderDirections, location);
     }
-
 
     /**
      * Sets the location of this game object.
@@ -163,6 +161,5 @@ public class BlockCluster implements GameObject{
     public void setUndoLocation(Vector2D undoLocation) {
         this.undoLocation = undoLocation;
     }
-
 
 }

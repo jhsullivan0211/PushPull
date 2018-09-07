@@ -8,6 +8,7 @@
     <color name="pushPullBlue">#375E97</color>
     <color name="pushPullYellow">#FFEC5C</color>
     <color name="buttonColor">#555555</color>
+    <color name="buttonAccentColor">#32cd32</color>
 
 </resources>
 

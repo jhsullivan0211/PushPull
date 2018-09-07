@@ -12,10 +12,13 @@ package com.jhsullivan.pushpull.game_logic;
     import com.jhsullivan.pushpull.triggers.Transformer;
     import com.jhsullivan.pushpull.triggers.Trigger;
 
+    import java.util.ArrayDeque;
     import java.util.ArrayList;
     import java.util.Collection;
     import java.util.Collections;
+    import java.util.Deque;
     import java.util.HashMap;
+    import java.util.HashSet;
     import java.util.List;
     import java.util.Map;
 
@@ -392,7 +395,7 @@ public class Level {
             currentTypes.put(player, player.getType());
         }
 
-        
+
 
         //Attempt moves
         List<Player> failures = new ArrayList<>();
@@ -404,18 +407,20 @@ public class Level {
         }
 
         //If a move really occurs, update undo locations.
-       if (moveFailures(moveDirection) || failures.size() < players.size()) {
-           for (GameObject obj : gameObjects) {
-               obj.setUndoLocation(currentLocations.get(obj));
-           }
+        if (moveFailures(moveDirection) || failures.size() < players.size()) {
+            for (GameObject obj : gameObjects) {
+                obj.setUndoLocation(currentLocations.get(obj));
+            }
 
-           for (Player player : players) {
-               player.setPreviousType(currentTypes.get(player));
-           }
-       }
+            for (Player player : players) {
+                player.setPreviousType(currentTypes.get(player));
+            }
+        }
 
         update();
     }
+
+
 
 
     /**

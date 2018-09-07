@@ -16,8 +16,18 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+/**
+ * This class tests the basic functionality of the Level class.  As of now, the only thing tested
+ * is the movement/behavior of each game object, specifically the players.  Any changes to the
+ * code should ensure that all of the following tests run, because these tests ensure that no
+ * code changes cause unintended changes to game behavior.
+ */
 public class LevelTest {
 
+    //Not used, but useful for copy/pasting in blank levels and then alterring them for specific
+    // test.
+
+    //                                   0  1  2  3  4  5  6  7  8  9
     public static String emptyLevel =   "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
@@ -28,6 +38,8 @@ public class LevelTest {
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
                                         "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+
 
 
     /**
@@ -41,23 +53,23 @@ public class LevelTest {
     public void testPushBlockBasic() throws LevelLoadException {
         //                   0  1  2  3  4  5  6  7  8  9
         String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //3
-                            "xx,xx,xx,xx,px,bx,xx,xx,xx,xx\n" + //4
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //5
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
-                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //3
+                "xx,xx,xx,xx,px,bx,xx,xx,xx,xx\n" + //4
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //5
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+                "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
 
         Level testLevel = new Level(testLayout);
         List<GameObject> movers = getMovers(testLevel, new HashSet<>());
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
-
     }
+
 
     /**
      * Tests whether a player can push a block cluster.  Expected result: Player and cluster both
@@ -225,7 +237,8 @@ public class LevelTest {
 
     /**
      * Tests basic functionality of the GRABALL Player type, which should move with all contiguous
-     * blocks.  Expected result: player and all blocks move to the right.
+     * blocks, but not through walls.  Expected result: player and all blocks move to the right,
+     * single block that is connected only by wall does not move. TODO: add that wall feature.
      *
      * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
      *                             not being properly formatted.
@@ -252,6 +265,7 @@ public class LevelTest {
         testGameObjectEndPoints(testLevel, resultMap);
     }
 
+
     /**
      * Tests whether the Graball Player can be indirectly blocked by a wall in the way of one of the
      * blocks connected to it.  Expected result: no movement of anything.
@@ -261,13 +275,41 @@ public class LevelTest {
      */
 
     @Test
-    public void testGrabAllBlocked() throws LevelLoadException {
+    public void testGrabAllBlockedIndirectly() throws LevelLoadException {
         //                   0  1  2  3  4  5  6  7  8  9
         String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
                             "xx,xx,xx,bx,bx,bx,wx,xx,xx,xx\n" + //1
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //2
                             "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //3
                             "xx,bx,bx,bx,rx,bx,xx,xx,xx,xx\n" + //4
+                            "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,xx,bx,bx,bx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel);
+        testLevel.processInput(Vector2D.Direction.RIGHT);
+        testGameObjectEndPoints(testLevel, resultMap);
+    }
+
+
+    /**
+     * Tests whether the Graball Player can be directly blocked by a wall in the way of one of the
+     * blocks connected to it.  Expected result: no movement of anything.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testGrabAllBlockedDirectly() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,bx,bx,bx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //2
+                            "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //3
+                            "xx,bx,bx,bx,rx,wx,xx,xx,xx,xx\n" + //4
                             "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //5
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //6
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //7
@@ -343,7 +385,6 @@ public class LevelTest {
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
-
     }
 
 
@@ -373,8 +414,8 @@ public class LevelTest {
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
-
     }
+
 
     /**
      * Tests whether the PULL type player fails to move into a wall, even while pulling a block.
@@ -403,6 +444,7 @@ public class LevelTest {
         testGameObjectEndPoints(testLevel, resultMap);
     }
 
+
     /**
      * Tests whether the PULL type player can still move if it fails to pull the other block.
      * Expected result:  Only the player moves to the right.
@@ -430,8 +472,137 @@ public class LevelTest {
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
+    }
+
+
+    /**
+     * Tests whether pull and push type players can still move from a group stuck together with
+     * a yellow block which is stuck, moving any blocks that they normally would.
+     * Expected result:  The PUSH-type player should move up, pushing the block in front of it
+     * up as well.  The PULL-type player should move up, pulling the block below it up as well.
+     * Everything else should remain where it is.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testPushPullDetachmentFromGrabAll() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,bx,bx,bx,xx,xx,xx,xx,xx\n" + //2
+                            "xx,xx,px,xx,bx,bx,xx,qx,xx,xx\n" + //3
+                            "xx,wx,1x,1x,rx,bx,bx,bx,xx,xx\n" + //4
+                            "xx,1x,1x,xx,xx,xx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        List<GameObject> movers = new ArrayList<>();
+        movers.add(testLevel.getObjectAt(2, 3));
+        movers.add(testLevel.getObjectAt(2, 2));
+        movers.add(testLevel.getObjectAt(7, 3));
+        movers.add(testLevel.getObjectAt(7, 4));
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.UP, movers);
+        testLevel.processInput(Vector2D.Direction.UP);
+        testGameObjectEndPoints(testLevel, resultMap);
 
     }
+
+
+    /**
+     * Tests whether large groups of PUSH and PULL type players can move together. Expected result:
+     * everything moves right.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testBigGroupPushPullMovement() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,qx,qx,qx,qx,qx,xx,xx,xx\n" + //2
+                            "xx,xx,px,qx,px,px,qx,px,px,xx\n" + //3
+                            "xx,xx,qx,px,px,px,px,px,xx,xx\n" + //4
+                            "xx,xx,px,px,px,px,qx,px,xx,xx\n" + //5
+                            "xx,xx,px,px,qx,px,px,px,xx,xx\n" + //6
+                            "xx,xx,px,px,px,px,qx,px,xx,xx\n" + //7
+                            "xx,xx,xx,xx,px,qx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT);
+        testLevel.processInput(Vector2D.Direction.RIGHT);
+        testGameObjectEndPoints(testLevel, resultMap);
+
+    }
+
+
+    /**
+     * Tests whether transformers work properly.  Expected result:  Each player should transform
+     * into a new type after moving onto the transformers and afterward should perform the
+     * functions of that type.
+     *
+     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+     *                             not being properly formatted.
+     */
+    @Test
+    public void testTransformerFunctionality() throws LevelLoadException {
+        //                   0  1  2  3  4  5  6  7  8  9
+        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //1
+                            "xx,xx,xx,qx,Px,xx,xx,xx,xx,xx\n" + //2
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //3
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //4
+                            "xx,xx,xx,px,Rx,bx,xx,xx,xx,xx\n" + //5
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //6
+                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //7
+                            "xx,xx,bx,rx,Qx,xx,xx,xx,xx,xx\n" + //8
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx";    //9
+
+        Level testLevel = new Level(testLayout);
+        testLevel.processInput(Vector2D.Direction.RIGHT);
+        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.UP);
+        resultMap.remove(testLevel.getObjectAt(3,8));
+        resultMap.remove(testLevel.getObjectAt(4,3));
+        testLevel.processInput(Vector2D.Direction.UP);
+        testGameObjectEndPoints(testLevel, resultMap);
+
+    }
+
+//    /**
+//     * Tests whether a player can push a cluster when that cluster can only move if a second player
+//     * moves, and the second player can only move if the cluster moves.  Tests this with a pair
+//     * of PUSH players and a pair of PULL players, with their own clusters.  Expected result:
+//     * everything moves to the right.
+//     *
+//     * @throws LevelLoadException  Throws this exception if the Level fails to load due to String
+//     *                             not being properly formatted.
+//     */
+//    @Test
+//    public void testSimultaneousMutuallyReliantMovement() throws LevelLoadException {
+//        //                   0  1  2  3  4  5  6  7  8  9
+//        String testLayout = "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //0
+//                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //1
+//                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //2
+//                            "xx,xx,1x,1x,1x,xx,2x,2x,2x,xx\n" + //3
+//                            "xx,xx,1x,px,1x,xx,2x,qx,2x,xx\n" + //4
+//                            "xx,xx,xx,xx,1x,xx,xx,xx,2x,xx\n" + //5
+//                            "xx,xx,1x,px,1x,xx,2x,qx,2x,xx\n" + //6
+//                            "xx,xx,1x,1x,1x,xx,2x,2x,2x,xx\n" + //7
+//                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx\n" + //8
+//                            "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
+//
+//        Level testLevel = new Level(testLayout);
+//        Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT);
+//        testLevel.processInput(Vector2D.Direction.RIGHT);
+//        testGameObjectEndPoints(testLevel, resultMap);
+//
+//    }
+
 
 
 
@@ -455,10 +626,16 @@ public class LevelTest {
             GameObject obj = entry.getKey();
             Vector2D loc = entry.getValue();
 
+            try {
+                assertNotNull(testLevel.getObjectAt(loc));
+                assertEquals(testLevel.getObjectAt(loc), obj);
+                assertEquals(obj.getLocation(), loc);
+            }
+            catch (AssertionError e){
+                System.out.println(loc.toString());
+                throw e;
+            }
 
-            assertNotNull(testLevel.getObjectAt(loc));
-            assertEquals(testLevel.getObjectAt(loc), obj);
-            assertEquals(obj.getLocation(), loc);
 
         }
     }
@@ -467,7 +644,8 @@ public class LevelTest {
     /**
      * Given a list of directions and a list of game objects, returns a mapping of each
      * game object to a new point relative to that object's location, after moving in all of the
-     * directions in the specified list.
+     * directions in the specified list.  If the list of movers is empty, treats all objects in
+     * the level as belonging to that list.
      *
      * @param level             The Level that the game objects reside in.
      * @param directions        List of directions to move in.
@@ -482,17 +660,20 @@ public class LevelTest {
         Map<GameObject, Vector2D> result = new HashMap<>();
 
         for (GameObject obj : level.getGameObjects()) {
-            if (movers.contains(obj)) {
+            if (movers.contains(obj) || movers.size() == 0) {
                 Vector2D resultingLocation = obj.getLocation().getPointFromDirections(directions);
                 result.put(obj, resultingLocation);
             }
             else {
                 result.put(obj, obj.getLocation());
             }
+
+
         }
 
         return result;
     }
+
 
     /**
      *  Given a direction and a list number of game objects, returns a mapping of each
@@ -517,6 +698,28 @@ public class LevelTest {
     }
 
     /**
+     *  Given a direction and a list number of game objects, returns a mapping of each
+     * game object to a new point relative to that object's location, after moving in all of the
+     * directions in the specified list.
+     *
+     * @param level             The Level in which the game objects reside.
+     * @param direction         Directions to move in.
+     * @param movers            List of game objects expected to move.
+     * @return                  Returns a map of each specified game object to a new location after
+     *                          moving.
+     */
+
+    private Map<GameObject, Vector2D> getResultPointMap(Level level,
+                                                        Vector2D.Direction direction) {
+
+        List<Vector2D.Direction> dummyList = new ArrayList<>();
+        dummyList.add(direction);
+        List<GameObject> dummyMovers = new ArrayList<>();
+        return getResultPointMap(level, dummyList, dummyMovers);
+
+    }
+
+    /**
      *  Given a level, returns the map of game objects to their locations.
      *
      * @return                  Returns a map of each specified game object to a new location after
@@ -530,7 +733,6 @@ public class LevelTest {
         return getResultPointMap(level, dummyList, dummyObjects);
 
     }
-
 
 
     /**
@@ -550,8 +752,8 @@ public class LevelTest {
                              .collect(Collectors.toList());
 
         return moverList;
-
     }
+
 
     /**
      * Given a level, gets all game objects that are not walls.  Overloaded version of the above
@@ -563,6 +765,4 @@ public class LevelTest {
     private List<GameObject> getMovers(Level level) {
         return getMovers(level, new HashSet<>());
     }
-
-
 }

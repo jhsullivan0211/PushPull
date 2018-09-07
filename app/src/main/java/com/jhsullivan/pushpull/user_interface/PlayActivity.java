@@ -1,15 +1,17 @@
 package com.jhsullivan.pushpull.user_interface;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.Button;
@@ -20,14 +22,12 @@ import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_logic.LevelLoadException;
 import com.jhsullivan.pushpull.game_logic.LevelManager;
 import com.jhsullivan.pushpull.game_objects.GameObject;
-import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**  This activity contains the main game, handling input, display, and navigation.
@@ -54,17 +54,22 @@ public class PlayActivity extends AppCompatActivity {
     LevelManager levelManager;
     InputController inputController;
     private int clickAnimSpeed = 100;
+    private Context context;
 
     public static final String[] winMessages = {"Success!", "Brilliant!", "Marvelous!",
                                                 "Excellent!", "Well done!", "Fantastic!",
                                                 "Superb!", "Nice!", "Great job!"};
 
-    public List<String> winMessageList = Arrays.asList(winMessages);
+    private List<String> winMessageList = Arrays.asList(winMessages);
     private int winMessageIndex = winMessages.length;
     private boolean soundOn = true;
     static final int LEVEL_SELECT_RID = 278;
     private Animation clickAnimation = new ScaleAnimation(1f, 1.1f,
             1f, 1.1f, 100, 100);
+
+    private MediaPlayer restartSoundPlayer;
+    private MediaPlayer undoSoundPlayer;
+    private MediaPlayer successSoundPlayer;
 
     public static Resources resourceAccess;
 
@@ -78,6 +83,7 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         resourceAccess = getResources();
         setContentView(R.layout.activity_play);
         levelView = findViewById(R.id.levelView);
@@ -85,8 +91,11 @@ public class PlayActivity extends AppCompatActivity {
         Intent intent = getIntent();
         clickAnimation.setDuration(clickAnimSpeed);
 
-        int buttonWidth = findViewById(R.id.soundButton).getWidth();
-        int buttonHeight = findViewById(R.id.soundButton).getHeight();
+
+
+        ImageButton soundButton = findViewById(R.id.soundButton);
+        int buttonWidth = soundButton.getWidth();
+        int buttonHeight = soundButton.getHeight();
 
         clickAnimation = new ScaleAnimation(1f, 1.1f,
                 1f, 1.1f, buttonWidth * 2, buttonHeight * 2);
@@ -99,6 +108,9 @@ public class PlayActivity extends AppCompatActivity {
             }
             else {
                 int currentLevelIndex = intent.getIntExtra(ActivityUtility.currentLevelID, -1);
+                if (!intent.getBooleanExtra(ActivityUtility.soundID, false)) {
+                    toggleSound();
+                }
 
 
                 if (currentLevelIndex == -1) {
@@ -117,6 +129,37 @@ public class PlayActivity extends AppCompatActivity {
         }
 
        enableButtons();
+    }
+
+    /**
+     * Called when the activity starts (i.e. comes into view).
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        restartSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+        successSoundPlayer = MediaPlayer.create(context, R.raw.success_sound);
+        undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+    }
+
+    /**
+     * Called when the activity is no longer in view.
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("STOPPING", "onStop: HERE");
+        if (restartSoundPlayer != null) {
+            restartSoundPlayer.release();
+        }
+
+        if (undoSoundPlayer != null) {
+            undoSoundPlayer.release();
+        }
+
+        if (successSoundPlayer != null) {
+            successSoundPlayer.release();
+        }
     }
 
     /**
@@ -239,6 +282,9 @@ public class PlayActivity extends AppCompatActivity {
      * Shows a victory message and advances to the next level after the user clicks it.
      */
     public void activateWinEvent() {
+        if (soundOn) {
+            successSoundPlayer.start();
+        }
         final ConstraintLayout winLayout = findViewById(R.id.winLayout);
         winLayout.setAlpha(0);
         winLayout.setVisibility(View.VISIBLE);
@@ -259,6 +305,9 @@ public class PlayActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * The event to activate when the game is won.  Opens the victory screen activity.
+     */
     public void activateGameOverEvent() {
         Intent endIntent = new Intent(this, VictoryActivity.class);
         startActivity(endIntent);
@@ -268,11 +317,15 @@ public class PlayActivity extends AppCompatActivity {
      * Enables the use of the buttons on the activity.
      */
     private void enableButtons() {
-        final ImageButton skipButton = findViewById(R.id.undo);
-        skipButton.setOnClickListener(new View.OnClickListener() {
+
+        final ImageButton undoButton = findViewById(R.id.undo);
+        undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                skipButton.startAnimation(clickAnimation);
+                if (soundOn) {
+                    undoSoundPlayer.start();
+                }
+                undoButton.startAnimation(clickAnimation);
                 undo();
             }
         });
@@ -281,6 +334,9 @@ public class PlayActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (soundOn) {
+                    restartSoundPlayer.start();
+                }
                 resetButton.startAnimation(clickAnimation);
                 resetLevel();
             }
@@ -328,21 +384,27 @@ public class PlayActivity extends AppCompatActivity {
 
         //debug - TODO: remove this
 
-        loadLevel(34);
+        loadLevel(36);
         //end
 
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {
             soundButton.setImageResource(R.drawable.sound_off_icon);
+            AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (amanager != null) {
+                amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            }
+
         }
         else {
             soundButton.setImageResource(R.drawable.sound_on_icon);
+            AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (amanager != null) {
+                amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+            }
         }
         soundOn = !soundOn;
-
-
     }
-
 
     /**
      * Opens the LevelSelectActivity activity, passing it any relevant data that it needs.
@@ -388,9 +450,7 @@ public class PlayActivity extends AppCompatActivity {
         if (levelManager.checkVictory()) {
             activateWinEvent();
         }
-
         levelView.invalidate();
-
     }
 
     /**
@@ -407,9 +467,4 @@ public class PlayActivity extends AppCompatActivity {
         winMessage.setText(winMessageList.get(winMessageIndex));
         winMessageIndex += 1;
     }
-
-
-
-
-
 }

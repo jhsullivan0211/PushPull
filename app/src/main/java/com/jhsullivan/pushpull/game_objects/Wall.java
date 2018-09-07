@@ -125,12 +125,4 @@ public class Wall implements GameObject{
     public void setUndoLocation(Vector2D undoLocation) {
 
     }
-
-
-
-
-
-
-
-
 }
