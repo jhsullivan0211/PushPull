@@ -39,7 +39,7 @@ public class LevelView extends View {
     private int marginX;
     private int marginY;
 
-    public Drawable coveredTargetIconn;
+    public Drawable coveredTargetIcon;
     public Drawable targetIcon;
     public int radiusFactor = 205;
 
@@ -88,7 +88,7 @@ public class LevelView extends View {
      * @param context   The context of this View, usually an Activity.
      */
     private void init(final Context context) {
-        coveredTargetIconn = getResources().getDrawable(R.drawable.check);
+        coveredTargetIcon = getResources().getDrawable(R.drawable.check);
         targetIcon = getResources().getDrawable(R.drawable.target_icon);
         final Activity activity = (Activity) context;
         this.setWillNotDraw(false);

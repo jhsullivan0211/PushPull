@@ -249,15 +249,17 @@ public class LevelTest {
                             "xx,xx,xx,bx,bx,bx,xx,xx,xx,xx\n" + //1
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //2
                             "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //3
-                            "xx,bx,bx,bx,rx,bx,xx,xx,xx,xx\n" + //4
-                            "xx,bx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //5
+                            "xx,wx,bx,bx,rx,bx,xx,xx,xx,xx\n" + //4
+                            "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //5
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //6
                             "xx,xx,xx,xx,bx,xx,xx,xx,xx,xx\n" + //7
                             "xx,xx,xx,bx,bx,bx,xx,xx,xx,xx\n" + //8
                             "xx,xx,xx,xx,xx,xx,xx,xx,xx,xx";    //9
 
         Level testLevel = new Level(testLayout);
-        List<GameObject> movers = getMovers(testLevel, new HashSet<>());
+        Set<GameObject> nonMovers = new HashSet<>();
+        nonMovers.add(testLevel.getObjectAt(1, 3));
+        List<GameObject> movers = getMovers(testLevel, nonMovers);
         Map<GameObject, Vector2D> resultMap = getResultPointMap(testLevel, Vector2D.Direction.RIGHT, movers);
         testLevel.processInput(Vector2D.Direction.RIGHT);
         testGameObjectEndPoints(testLevel, resultMap);
@@ -702,7 +704,6 @@ public class LevelTest {
      *
      * @param level             The Level in which the game objects reside.
      * @param direction         Directions to move in.
-     * @param movers            List of game objects expected to move.
      * @return                  Returns a map of each specified game object to a new location after
      *                          moving.
      */

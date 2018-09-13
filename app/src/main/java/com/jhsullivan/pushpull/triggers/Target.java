@@ -1,16 +1,13 @@
 package com.jhsullivan.pushpull.triggers;
 
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 
-import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
 import com.jhsullivan.pushpull.user_interface.LevelView;
-import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 /**
  * Represents the target that must be covered with a block to win.
@@ -90,7 +87,7 @@ public class Target implements Trigger {
      */
     public void drawSuccessIcon(LevelView levelView, Canvas canvas) {
         DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(levelView.coveredTargetIconn, location);
+        drawingHelper.drawIcon(levelView.coveredTargetIcon, location);
     }
 
 

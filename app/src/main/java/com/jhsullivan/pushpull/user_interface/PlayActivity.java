@@ -320,6 +320,7 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (soundOn && canUndo) {
+                    undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
                     undoSoundPlayer.start();
                 }
                 undoButton.startAnimation(clickAnimation);
@@ -384,25 +385,20 @@ public class PlayActivity extends AppCompatActivity {
      */
     public void toggleSound() {
 
-        //debug - TODO: remove this
-
-        loadLevel(36);
-        //end
-
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {
             soundButton.setImageResource(R.drawable.sound_off_icon);
-            AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (amanager != null) {
-                amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
             }
 
         }
         else {
             soundButton.setImageResource(R.drawable.sound_on_icon);
-            AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (amanager != null) {
-                amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
             }
         }
         soundOn = !soundOn;
