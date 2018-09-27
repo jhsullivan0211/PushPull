@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -65,11 +66,11 @@ public class PlayActivity extends AppCompatActivity {
     private Animation clickAnimation = new ScaleAnimation(1f, 1.1f,
             1f, 1.1f, 100, 100);
 
-    private MediaPlayer restartSoundPlayer;
-    private MediaPlayer undoSoundPlayer;
+    private MediaPlayer actionSoundPlayer;
     private MediaPlayer successSoundPlayer;
     public static Resources resourceAccess;
     private boolean canUndo = false;
+    private boolean canReset = false;
 
 
     /**
@@ -88,7 +89,6 @@ public class PlayActivity extends AppCompatActivity {
         inputController = findViewById(R.id.inputController);
         Intent intent = getIntent();
         clickAnimation.setDuration(clickAnimSpeed);
-
         ImageButton soundButton = findViewById(R.id.soundButton);
         int buttonWidth = soundButton.getWidth();
         int buttonHeight = soundButton.getHeight();
@@ -133,9 +133,7 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        restartSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
-        undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
-        undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+        actionSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
         successSoundPlayer = MediaPlayer.create(context, R.raw.success_sound);
     }
 
@@ -145,17 +143,15 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (restartSoundPlayer != null) {
-            restartSoundPlayer.release();
-        }
-
-        if (undoSoundPlayer != null) {
-            undoSoundPlayer.release();
+        if (actionSoundPlayer != null) {
+            actionSoundPlayer.release();
         }
 
         if (successSoundPlayer != null) {
             successSoundPlayer.release();
         }
+
+
     }
 
     /**
@@ -169,7 +165,7 @@ public class PlayActivity extends AppCompatActivity {
     private void unpackBundle(Bundle savedInstanceState) {
         int levelIndex = savedInstanceState.getInt(ActivityUtility.currentLevelID);
         loadLevel(levelIndex);
-
+        soundOn = savedInstanceState.getBoolean(ActivityUtility.soundID);
         Level level = levelManager.getCurrentLevel();
         Serializable currentSerial = savedInstanceState.getSerializable(ActivityUtility.gameStateID);
         List<GameObject> currentGameState = (List<GameObject>) currentSerial;
@@ -186,11 +182,12 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-
         Level level = levelManager.getCurrentLevel();
         Serializable gameObjects = (Serializable) level.getGameObjects();
         savedInstanceState.putSerializable(ActivityUtility.gameStateID, gameObjects);
         savedInstanceState.putInt(ActivityUtility.currentLevelID, levelManager.getLevelIndex());
+        savedInstanceState.putBoolean(ActivityUtility.soundID, soundOn);
+
     }
 
     /**
@@ -201,6 +198,7 @@ public class PlayActivity extends AppCompatActivity {
         try {
             levelManager.reset();
             canUndo = false;
+            canReset = false;
         }
         catch (LevelLoadException e) {
             ActivityUtility.showAlert("Level Load Error", "There was an error "+
@@ -232,6 +230,7 @@ public class PlayActivity extends AppCompatActivity {
      * @param index  The level index to load.
      */
     private void loadLevel(int index) {
+
         try {
 
             if (index < 0) {
@@ -264,6 +263,8 @@ public class PlayActivity extends AppCompatActivity {
 
             levelManager.setLevel(index);
             levelView.setLevel(levelManager.getCurrentLevel());
+            canReset = false;
+            canUndo = false;
 
             TextView message = findViewById(R.id.message);
             message.setText(levelManager.getCurrentLevel().getMessage());
@@ -320,8 +321,8 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (soundOn && canUndo) {
-                    undoSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
-                    undoSoundPlayer.start();
+                    actionSoundPlayer = MediaPlayer.create(context, R.raw.action_click);
+                    actionSoundPlayer.start();
                 }
                 undoButton.startAnimation(clickAnimation);
                 undo();
@@ -332,8 +333,8 @@ public class PlayActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (soundOn) {
-                    restartSoundPlayer.start();
+                if (soundOn && canReset) {
+                    actionSoundPlayer.start();
                 }
                 resetButton.startAnimation(clickAnimation);
                 resetLevel();
@@ -346,7 +347,7 @@ public class PlayActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (soundOn) {
-                    undoSoundPlayer.start();
+                    actionSoundPlayer.start();
                 }
 
                 levelSelect.startAnimation(clickAnimation);
@@ -408,11 +409,12 @@ public class PlayActivity extends AppCompatActivity {
      * Opens the LevelSelectActivity activity, passing it any relevant data that it needs.
      *
      */
-    public void openLevelSelect() {
+    private void openLevelSelect() {
 
         Intent levelSelectIntent = new Intent(this, LevelSelectActivity.class);
         levelSelectIntent.putExtra(ActivityUtility.levelCountID, levelManager.getLevelCount());
         levelSelectIntent.putExtra(ActivityUtility.currentLevelID, levelManager.getLevelIndex());
+        levelSelectIntent.putExtra(ActivityUtility.levelSelectSoundID, soundOn);
         startActivityForResult(levelSelectIntent, LEVEL_SELECT_RID);
     }
 
@@ -445,6 +447,7 @@ public class PlayActivity extends AppCompatActivity {
     public void handleInput(Vector2D.Direction direction) {
         if (levelManager.getCurrentLevel().processInput(direction)) {
             canUndo = true;
+            canReset = true;
         }
         if (levelManager.checkVictory()) {
             activateWinEvent();
@@ -466,4 +469,6 @@ public class PlayActivity extends AppCompatActivity {
         winMessage.setText(winMessageList.get(winMessageIndex));
         winMessageIndex += 1;
     }
+
+
 }

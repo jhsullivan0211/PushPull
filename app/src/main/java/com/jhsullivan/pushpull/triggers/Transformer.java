@@ -26,6 +26,7 @@ public class Transformer implements Trigger {
     private Player.Type type;
     private Level level;
     private Vector2D location;
+    private int color;
 
 
     /**
@@ -43,6 +44,17 @@ public class Transformer implements Trigger {
         this.level = level;
         filled = level.isPositionFilled(location);
         this.type = type;
+        switch (type) {
+            case PULL:
+                color = ColorHelper.getPullColor();
+                break;
+            case PUSH:
+                color = ColorHelper.getPushColor();
+                break;
+            case GRABALL:
+                color = ColorHelper.getGrabAllColor();
+                break;
+        }
 
     }
 
@@ -98,47 +110,26 @@ public class Transformer implements Trigger {
     }
 
     /**
-     * Draws this Transformer on the specified Canvas using the specified LevelView for drawing
-     * specifications.
+     * Draws this Transformer on the specified Canvas using the specified DrawingHelper.
      *
-     * @param levelView     The LevelView from which to get drawing specifications.
+     * @param drawingHelper The DrawingHelper that draws the object.
      * @param canvas        The Canvas on which to draw this Transformer.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
 
-
-//        Drawable drawIcon = grabIcon;
-//        switch (type) {
-//            case PULL:
-//                drawIcon = pullIcon;
-//                break;
-//            case PUSH:
-//                drawIcon = pushIcon;
-//                break;
-//            case GRABALL:
-//                drawIcon = grabIcon;
-//                break;
-//        }
-//        drawingHelper.drawIcon(drawIcon, location);
-
-        int color = ColorHelper.getPushColor();
-        switch (type) {
-            case PULL:
-                color = ColorHelper.getPullColor();
-                break;
-            case PUSH:
-                color = ColorHelper.getPushColor();
-                break;
-            case GRABALL:
-                color = ColorHelper.getGrabAllColor();
-                break;
-        }
-        drawingHelper.drawCircleBody(color, location);
+        drawingHelper.drawCircleBody(color, location, canvas);
 
     }
 
+    /**
+     *
+     * @return  Returns the color of this object.
+     */
+    @Override
+    public int getColor() {
+        return this.color;
+    }
 
 
 

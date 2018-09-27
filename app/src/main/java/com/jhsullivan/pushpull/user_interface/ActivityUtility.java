@@ -25,6 +25,7 @@ public class ActivityUtility {
     public static final String soundID = "PUSHPULL.SOUND";
     public static final String exitID = "PUSHPULL.EXIT";
     public static final String levelWidthID = "PUSHPULL.LEVELWIDTH";
+    public static final String levelSelectSoundID = "PUSHPULL.LEVELSELECTSOUNDID";
 
 
     /**

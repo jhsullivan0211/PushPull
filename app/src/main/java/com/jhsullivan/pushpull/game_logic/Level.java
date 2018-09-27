@@ -11,14 +11,12 @@ package com.jhsullivan.pushpull.game_logic;
     import com.jhsullivan.pushpull.triggers.Target;
     import com.jhsullivan.pushpull.triggers.Transformer;
     import com.jhsullivan.pushpull.triggers.Trigger;
+    import com.jhsullivan.pushpull.user_interface.DrawingHelper;
 
-    import java.util.ArrayDeque;
     import java.util.ArrayList;
     import java.util.Collection;
     import java.util.Collections;
-    import java.util.Deque;
     import java.util.HashMap;
-    import java.util.HashSet;
     import java.util.List;
     import java.util.Map;
 
@@ -51,24 +49,20 @@ public class Level {
 
     private static final int columnNumber = 10;
     private static final int rowNumber = 10;
-
     private final Vector2D levelBounds = new Vector2D(columnNumber - 1, rowNumber - 1);
     private final String layout;
-
     private ArrayList<GameObject> gameObjects = new ArrayList<>();
-
     private List<Player> players = new ArrayList<>();
     private List<Trigger> triggers = new ArrayList<>();
     private List<Wall> walls = new ArrayList<>();
     private List<Target> targets = new ArrayList<>();
     private Map<String, List<BlockCluster>> clusterGroups = new HashMap<>();
-
     private Map<Vector2D, GameObject> filledPositions = new HashMap<>();
-
-
     private boolean isComplete = false;
     private boolean finishedLoading = false;
     private String message = "";
+
+    private Map<GameObject, Vector2D> clusterBoundsMap = new HashMap<>();
 
 
     /**
@@ -155,8 +149,14 @@ public class Level {
            doShift = !doShift;
         }
 
+        boolean first = true;
         for (Wall wall : walls) {
            wall.groupWalls(walls);
+           if (first) {
+               wall.setMajor(true);
+               first = false;
+           }
+
         }
 
         for (GameObject obj : gameObjects) {
@@ -363,12 +363,27 @@ public class Level {
     }
 
     /**
-     * Updates the collection of stored BlockClusters contained by each cluster.
+     * Updates the collection of stored BlockClusters contained by each cluster.  Gives each
+     * cluster a reference to its connecting blocks, as well as storing the drawing path for the
+     * clusters.
      */
     private void updateClusters() {
         for (List<BlockCluster> clusterList : clusterGroups.values()) {
+            List<Vector2D> pathOrigin = new ArrayList<>();
             for (BlockCluster cluster : clusterList) {
+                pathOrigin.add(cluster.getLocation());
+            }
+
+            List<Vector2D> path = DrawingHelper.getPath(pathOrigin);
+
+            boolean first = true;
+            for (BlockCluster cluster : clusterList) {
+                if (first) {
+                    cluster.setMajor(true);
+                    first = false;
+                }
                 cluster.makeCluster(clusterList);
+                cluster.setPath(path);
             }
         }
     }
@@ -658,7 +673,7 @@ public class Level {
     /**
      * @return      Returns the width of the grid (currently always 10).
      */
-    public int getGridLength() {
+    public static int getGridLength() {
         return columnNumber;
     }
 
@@ -670,7 +685,7 @@ public class Level {
         return Collections.unmodifiableList(targets);
     }
 
-
-
-
+    public Map<GameObject, Vector2D> getClusterBoundsMap() {
+        return clusterBoundsMap;
+    }
 }

@@ -4,18 +4,33 @@ package com.jhsullivan.pushpull.user_interface;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
-
 import com.jhsullivan.pushpull.R;
+import com.jhsullivan.pushpull.game_logic.Actor;
 import com.jhsullivan.pushpull.game_logic.Level;
+import com.jhsullivan.pushpull.game_objects.BlockCluster;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
+import com.jhsullivan.pushpull.game_objects.Player;
+import com.jhsullivan.pushpull.game_objects.Wall;
 import com.jhsullivan.pushpull.triggers.Target;
 import com.jhsullivan.pushpull.triggers.Trigger;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class LevelView extends View {
@@ -28,20 +43,23 @@ public class LevelView extends View {
      */
 
     private static final int backgroundColor = ColorHelper.getBackgroundColor();
-    private static final int marginDivisorFactor = 100;
-
     private Level level;
     private Paint paint = new Paint(backgroundColor);
+    private Paint textPaint = new Paint(Color.BLACK);
     private int gridLength;
     private int actorUnit;
     private int size;
-    private int radius;
+    private float radius;
     private int marginX;
     private int marginY;
-
     public Drawable coveredTargetIcon;
     public Drawable targetIcon;
     public int radiusFactor = 205;
+
+    private int textSize = 16;
+    private int textPixels = 0;
+    private Map<List<Integer>, Shader> shaderMap = new HashMap<>();
+    private Map<Actor, DrawingHelper> drawingMap = new HashMap<>();
 
 
     /**
@@ -55,8 +73,9 @@ public class LevelView extends View {
         init(context);
     }
 
+
     /**
-     * Constructor that is called when inflating the View from XML.
+     * Constructor that is called when inflating the View from XML.f
      *
      * @param context   The context of the View.
      * @param attrs     The attributes of the XML tag that is inflating the View.
@@ -82,15 +101,26 @@ public class LevelView extends View {
     }
 
     /**
-     * The initialization method called by each constructor.  Initializes some variables and
-     * reformats the View according to the screen size.
+     * The initialization method called by each constructor.  Initializes some variables, performs
+     * some setup actions, and reformats the View according to the screen size.
      *
      * @param context   The context of this View, usually an Activity.
      */
     private void init(final Context context) {
         coveredTargetIcon = getResources().getDrawable(R.drawable.check);
-        targetIcon = getResources().getDrawable(R.drawable.target_icon);
-        final Activity activity = (Activity) context;
+        targetIcon = getResources().getDrawable(R.drawable.target_icon_small);
+
+        if (getResources().getDisplayMetrics().densityDpi <= 240) {
+            textSize = 14;
+        }
+
+        textPixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                textSize, getResources().getDisplayMetrics());
+
+
+
+        textPaint.setTextSize(textPixels);
+
         this.setWillNotDraw(false);
     }
 
@@ -109,7 +139,15 @@ public class LevelView extends View {
         radius = size / radiusFactor;
         actorUnit = size / gridLength;
         marginX = (this.getWidth() - size) / 2;
-        marginY = (this.getHeight() - size) / 2;
+        marginY = (this.getHeight() - size) / 2 - (textPixels / 2);
+
+        if (getBottom() - (getTop() + marginY + size) <= textPixels) {
+            textPaint.setTextSize(0);
+            marginY = (this.getHeight() - size) / 2;
+        }
+        mapDrawingHelpers();
+        invalidate();
+
     }
 
     /**
@@ -117,9 +155,12 @@ public class LevelView extends View {
      *
      * @param level The new level, to be set to.
      */
+
     public void setLevel(Level level) {
         this.level = level;
-        this.gridLength = level.getGridLength();
+        this.gridLength = Level.getGridLength();
+        //buildShaders();
+        mapDrawingHelpers();
         invalidate();
     }
 
@@ -129,9 +170,10 @@ public class LevelView extends View {
      *
      * @param canvas    The canvas on which to draw.
      */
+
     @Override
     public void onDraw(Canvas canvas) {
-
+        super.onDraw(canvas);
         if (level == null || size == 0) {
             return;
         }
@@ -141,18 +183,68 @@ public class LevelView extends View {
         drawGrid(canvas);
 
         for (Trigger trigger : level.getTriggers()) {
-            trigger.draw(this, canvas);
+            drawActor(trigger, canvas);
         }
+
+
 
         for (GameObject gameObject : level.getGameObjects()) {
-            gameObject.draw(this, canvas);
+            drawActor(gameObject, canvas);
         }
 
+
+
+        int count = 0;
+        int filled = 0;
         for (Target target : level.getTargets()) {
             if (target.isFilled()) {
-                target.drawSuccessIcon(this, canvas);
+                drawingMap.get(target).drawIcon("covered", target.getLocation(), canvas);
+                filled += 1;
             }
+            count += 1;
         }
+
+        int x = 4 * getActorUnit() + getActorUnit() * 3 / 4 + marginX;
+        int y = size + marginY + textPixels;
+        canvas.drawText(filled + "/" + count, x, y, textPaint);
+
+
+    }
+
+    /**
+     * Given an actor, gets its drawingHelper, loads the appropriate shader, and calls
+     * that actor's draw method.
+     *
+     * @param actor The actor to draw.
+     */
+    private void drawActor(Actor actor, Canvas canvas) {
+
+        DrawingHelper drawingHelper = drawingMap.get(actor);
+        int color = actor.getColor();
+//        //get the shader using the object's location, color, and bounds.
+//        int width = 1;
+//        int height = 1;
+//        if (actor instanceof BlockCluster) {
+//            if (!((BlockCluster) actor).getMajor()) {
+//                return;
+//            }
+//            width = level.getClusterBoundsMap().get(actor).getX();
+//            height = level.getClusterBoundsMap().get(actor).getY();
+//        }
+//        Shader shader = shaderMap.get(Arrays.asList(actor.getLocation().getX(),
+//                                                    actor.getLocation().getY(),
+//                                                    color,
+//                                                    width,
+//                                                    height));
+//        if (shader != null && actor instanceof BlockCluster) {
+//            Log.d("TEST", "drawActor: cluster shader!  " + actor.getLocation().getX() + "," +
+//                                                                    actor.getLocation().getY() + "," +
+//                                                                    color + ", " + width + ", " + height);
+//        }
+//        drawingHelper.loadShader(shader);
+
+
+        actor.draw(drawingHelper, canvas);
     }
 
     /**
@@ -170,9 +262,77 @@ public class LevelView extends View {
                 int y = (j * getActorUnit() + getActorUnit() / 2) + marginY;
 
                 canvas.drawCircle(x, y, radius, gridPaint);
+
             }
         }
     }
+
+    /**
+     * Fills the drawingMap with the mapping between actors and the DrawingHelper that will draw
+     * them.
+     */
+    private void mapDrawingHelpers() {
+        drawingMap = new HashMap<>();
+        for (GameObject obj : level.getGameObjects()) {
+            DrawingHelper drawingHelper = new DrawingHelper(this);
+            drawingHelper.setColor(obj.getColor());
+            drawingMap.put(obj, drawingHelper);
+        }
+
+        for (Trigger trigger : level.getTriggers()) {
+            DrawingHelper drawingHelper = new DrawingHelper(this);
+            drawingHelper.setColor(trigger.getColor());
+            drawingMap.put(trigger, drawingHelper);
+        }
+    }
+
+//    /**
+//     * Creates shaders for each location and each color, that can be accessed quickly using a
+//     * list of x, y, color, width, and height.
+//     */
+//    private void buildShaders() {
+//        shaderMap = new HashMap<>();
+//        List<Integer> colors = Arrays.asList(ColorHelper.getPushColor(),
+//                ColorHelper.getPullColor(),
+//                ColorHelper.getGrabAllColor(),
+//                ColorHelper.getBlockColor(),
+//                ColorHelper.getWallColor());
+//        for (int x = 0; x < Level.getGridLength(); x++) {
+//            for (int y = 0; y < Level.getGridLength(); y++) {
+//                for (Integer color : colors) {
+//                    Vector2D screenVectorA = getScreenVector(new Vector2D(x, y));
+//                    Vector2D screenVectorB = getScreenVector(new Vector2D(x + 1, y + 1));
+//
+//                    Shader shader = new LinearGradient(screenVectorA.getX(), screenVectorA.getY(),
+//                            screenVectorB.getX(), screenVectorB.getY(), color,
+//                            DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+//
+//                    shaderMap.put(Arrays.asList(x, y, color, 1, 1), shader);
+//
+//
+//
+//                    if (color != ColorHelper.getBlockColor()) {
+//                        continue;
+//                    }
+//                    for (Vector2D bounds : level.getClusterBoundsMap().values()) {
+//                        screenVectorA = getScreenVector(new Vector2D(x, y));
+//                        screenVectorB = getScreenVector(Vector2D.add(screenVectorA, bounds));
+//
+//
+//                        shader = new LinearGradient(screenVectorA.getX(), screenVectorA.getY(),
+//                                    screenVectorB.getX(), screenVectorB.getY(), color,
+//                                DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+//
+//                        shaderMap.put(Arrays.asList(x, y, color, bounds.getX(), bounds.getY()), shader);
+//                    }
+//
+//
+//                }
+//
+//
+//            }
+//        }
+//    }
 
     /**
      *
@@ -202,6 +362,24 @@ public class LevelView extends View {
         int y = inputVector.getY() * getActorUnit() + marginY;
         return new Vector2D(x, y);
     }
+
+
+    public void provideLayout(ConstraintLayout layout) {
+        if (layout.getTag() == "small") {
+            textSize = 0;
+        }
+    }
+
+    public Drawable getIcon(String tag) {
+        if (tag.equals("target")) {
+            return targetIcon;
+        }
+        if (tag.equals("covered")) {
+            return coveredTargetIcon;
+        }
+        return null;
+    }
+
 
 
 }

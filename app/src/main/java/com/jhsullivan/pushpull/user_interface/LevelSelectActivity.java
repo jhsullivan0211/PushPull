@@ -43,8 +43,7 @@ public class LevelSelectActivity extends AppCompatActivity {
     private int gridWidth;
     private MediaPlayer buttonSelectSound;
 
-    private View unlockLayout;
-    private View lockLayout;
+    private boolean soundOn = false;
 
 
     /**
@@ -65,6 +64,7 @@ public class LevelSelectActivity extends AppCompatActivity {
         currentLevelIndex = myIntent.getIntExtra(ActivityUtility.currentLevelID, -1);
         SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
         maxLevel = preferences.getInt(ActivityUtility.maxLevelID, -1);
+        soundOn = myIntent.getBooleanExtra(ActivityUtility.levelSelectSoundID, false);
 
         if (levelCount == 0 || maxLevel == -1) {
             ActivityUtility.showAlert("Level Error", "An error occurred while " +
@@ -152,7 +152,9 @@ public class LevelSelectActivity extends AppCompatActivity {
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            buttonSelectSound.start();
+                            if (soundOn) {
+                                buttonSelectSound.start();
+                            }
                             setLevel(levelIndex);
                         }
                     });

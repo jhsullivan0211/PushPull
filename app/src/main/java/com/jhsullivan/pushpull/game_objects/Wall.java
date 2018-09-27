@@ -21,6 +21,8 @@ public class Wall implements GameObject{
     private int color = ColorHelper.getWallColor();
     private Vector2D location;
     private List<Wall> walls = new ArrayList<>();
+    private List<Vector2D> path;
+    private boolean isMajor;
 
 
     /**
@@ -59,23 +61,18 @@ public class Wall implements GameObject{
     }
 
     /**
-     * Draws the wall, taking the wall's adjacent wells into account when drawing the borders.
+     * Draws the wall onto the specified canvas using the specified DrawingHelper.
      *
-     * @param levelView     The LevelView from which to get drawing information.
+     * @param drawingHelper The DrawingHelper that helps draw the object.
      * @param canvas        The canvas on which to draw.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawSquareBody(color, location);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
+//        if (isMajor) {
+//            drawingHelper.drawPolygon(path, color, canvas);
+//        }
 
-        List<Vector2D.Direction> borderDirections = new ArrayList<>();
-        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-            if (!hasAdjacentWall(direction)) {
-                borderDirections.add(direction);
-            }
-        }
-        drawingHelper.drawBorders(borderDirections, location);
+        drawingHelper.drawSquareBody(color, location, canvas);
     }
 
     /**
@@ -125,4 +122,26 @@ public class Wall implements GameObject{
     public void setUndoLocation(Vector2D undoLocation) {
 
     }
+
+    /**
+     *
+     * @return  Returns the color of the object.
+     */
+    @Override
+    public int getColor() {
+        return this.color;
+    }
+
+    public void setPath(List<Vector2D> path) {
+        this.path = path;
+    }
+
+    public boolean isMajor() {
+        return this.isMajor;
+    }
+
+    public void setMajor(boolean major) {
+        this.isMajor = major;
+    }
+
 }

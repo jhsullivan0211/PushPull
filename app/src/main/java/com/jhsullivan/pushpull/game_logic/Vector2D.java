@@ -2,6 +2,7 @@ package com.jhsullivan.pushpull.game_logic;
 
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -410,6 +411,47 @@ public class Vector2D implements Serializable{
      */
     public Vector2D getPointFromDirections(List<Direction> directions) {
         return getPointFromDirections(directions, 1);
+    }
+
+    /**
+     * An overloaded version of {@code getPointFromDirections(List<Direction> directions,
+     * int distancePerMove)} with a default move distance of 1, using variable arguments for
+     * the direction list..
+     *
+     * @param directions    A variable list of directions to move in.
+     * @return              The point reached after moving in each direction in the arguments.
+     */
+    public Vector2D getPointFromDirections(Direction ... directions) {
+        return getPointFromDirections(Arrays.asList(directions));
+    }
+
+    /**
+     * Given a group of Vector2D points, returns the upper left and bottom right points of the
+     * smallest rectangle that contains all of the points.
+     * @param points
+     * @return
+     */
+    public static List<Vector2D> getBounds(List<Vector2D> points) {
+        int maxX = Integer.MIN_VALUE;
+        int minX = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        for (Vector2D point : points) {
+            if (point.getX() < minX) {
+                minX = point.getX();
+            }
+            if (point.getX() > maxX) {
+                maxX = point.getX();
+            }
+            if (point.getY() < minY) {
+                minY = point.getY();
+            }
+            if (point.getY() > maxY) {
+                maxY = point.getY();
+            }
+        }
+
+        return Arrays.asList(new Vector2D(minX, minY), new Vector2D(maxX, maxY));
     }
 
 }

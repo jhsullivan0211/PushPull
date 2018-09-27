@@ -26,7 +26,7 @@ public class Player implements GameObject{
     public enum Type {PUSH, PULL, GRABALL};
 
     private Type type;
-    private int color;
+    private int color = ColorHelper.getPushColor();
     private Vector2D location;
     private boolean move = true;
 
@@ -195,15 +195,13 @@ public class Player implements GameObject{
     }
 
     /**
-     * Method to draw the player.
+     * Draws the game object onto the specified Canvas using the specified DrawingHelper.
      *
-     * @param levelView
-     * @param canvas
+     * @param drawingHelper     The DrawingHelper to use to help draw the object.
+     * @param canvas            The Canvas on which to draw.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        int color = ColorHelper.getPushColor();
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
         if (type == Type.PUSH) {
             color = ColorHelper.getPushColor();
         }
@@ -214,8 +212,7 @@ public class Player implements GameObject{
             color = ColorHelper.getGrabAllColor();
         }
 
-        drawingHelper.drawSquareBody(color, location);
-        drawingHelper.drawAllBorders(location);
+        drawingHelper.drawSquareBody(color, location, canvas);
     }
 
     /**
@@ -266,6 +263,15 @@ public class Player implements GameObject{
     @Override
     public void setUndoLocation(Vector2D undoLocation) {
         this.undoLocation = undoLocation;
+    }
+
+    /**
+     *
+     * @return  Returns the color of the object.
+     */
+    @Override
+    public int getColor() {
+        return this.color;
     }
 
 }

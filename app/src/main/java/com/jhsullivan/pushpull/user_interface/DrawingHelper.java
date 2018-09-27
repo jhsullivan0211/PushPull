@@ -1,13 +1,23 @@
 package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.CornerPathEffect;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -18,11 +28,16 @@ import java.util.Collection;
 
 public class DrawingHelper {
     private enum Shape {CIRCLE, SQUARE};
-    private int borderWidth;
-    private int borderWidthFactor = 205;
-    private LevelView levelView;
-    private Canvas canvas;
 
+    private LevelView levelView;
+    private float radius = 12.0f; //was 10.0
+    private Paint paint = new Paint();
+    private Path path = new Path();
+    int borderColor = Color.BLACK;
+    private int borderWidth;
+    private int borderAlpha = 85;
+    private int borderWidthFactor = 325;
+    private Paint borderPaint = new Paint();
 
 
     /**
@@ -32,10 +47,60 @@ public class DrawingHelper {
      * @param levelView     The LevelView in which to get drawing specifications.
      * @param canvas        The Canvas on which to draw.
      */
-    public DrawingHelper(LevelView levelView, Canvas canvas) {
+    public DrawingHelper(LevelView levelView) {
         this.levelView = levelView;
-        this.canvas = canvas;
         this.borderWidth = levelView.getSize() / borderWidthFactor;
+
+        int width = levelView.getActorUnit();
+        paint.setAntiAlias(true);
+
+        CornerPathEffect rounding = new CornerPathEffect(radius);
+        paint.setPathEffect(rounding);
+        borderPaint.setColor(borderColor);
+        borderPaint.setAlpha(borderAlpha);
+        borderPaint.setStrokeWidth(borderWidth);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setAntiAlias(true);
+        borderPaint.setPathEffect(rounding);
+
+    }
+
+    /**
+     * Sets the color of the fill for this DrawingHelper.
+     * @param color The color to set.
+     */
+    public void setColor(int color) {
+        paint.setColor(color);
+    }
+
+//    /**
+//     * Prepares the shader for gradients and loads it into the paint field.
+//     *
+//     * @param x  The x-coordinate of the start of the gradient.
+//     * @param y  The y-coordinate of the start of the gradient.
+//     * @param color  The color of the start, i.e. the lightest part, of the gradient.
+//     */
+//    public void prepareShader(int x, int y, int color) {
+//        int width = levelView.getActorUnit();
+//        Shader shader = new LinearGradient(x, y, x+width, y+width, Color.WHITE, getGradientTint(Color.LTGRAY), Shader.TileMode.CLAMP);
+//        paint.setShader(shader);
+//    }
+
+    public void setRound(boolean round) {
+        if (round) {
+            CornerPathEffect rounding = new CornerPathEffect(radius);
+            paint.setPathEffect(rounding);
+            borderPaint.setPathEffect(rounding);
+        }
+        else {
+            paint.setPathEffect(null);
+            borderPaint.setPathEffect(null);
+            borderPaint.setAlpha(0);
+        }
+    }
+
+    public void loadShader(Shader shader) {
+        paint.setShader(shader);
     }
 
     /**
@@ -44,8 +109,8 @@ public class DrawingHelper {
      * @param color     The color of the square's fill.
      * @param location  The location to draw the square.
      */
-    public void drawSquareBody(int color, Vector2D location) {
-       drawBody(Shape.SQUARE, location, color);
+    public void drawSquareBody(int color, Vector2D location, Canvas canvas) {
+       drawBody(Shape.SQUARE, location, color, canvas);
     }
 
     /**
@@ -54,8 +119,8 @@ public class DrawingHelper {
      * @param color         The color of the circle's fill.
      * @param location      The location to draw the circle.
      */
-    public void drawCircleBody(int color, Vector2D location) {
-        drawBody(Shape.CIRCLE, location, color);
+    public void drawCircleBody(int color, Vector2D location, Canvas canvas) {
+        drawBody(Shape.CIRCLE, location, color, canvas);
     }
 
     /**
@@ -66,84 +131,142 @@ public class DrawingHelper {
      * @param location  The location to draw the shape.
      * @param color     The color of the shape to draw.
      */
-    private void drawBody(Shape shape, Vector2D location, int color) {
+    private void drawBody(Shape shape, Vector2D location, int color, Canvas canvas) {
+
         Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
         int width = levelView.getActorUnit();
         int circleOffset = levelView.getActorUnit() / 10;
 
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(color);
+        //Test creating new shader on each draw
+        Shader shader = new LinearGradient(x, y, x + width, y + width, color,
+                DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+
+        paint.setShader(shader);
+        //end test
         if (shape == Shape.SQUARE) {
-            canvas.drawRect(x, y, x + width, y + width, paint);
+            path.reset();
+            path.moveTo(x, y);
+            path.lineTo(x + width, y);
+            path.lineTo(x + width, y + width);
+            path.lineTo(x, y + width);
+            path.lineTo(x, y);
+            path.close();
+            canvas.drawPath(path, paint);
+            canvas.drawPath(path, borderPaint);
         }
         else if (shape == Shape.CIRCLE) {
             canvas.drawCircle(x + width / 2, y + width / 2,
                     width / 2 - circleOffset, paint);
         }
+
     }
 
     /**
-     * Draws all four borders at the specified location, forming a square.
+     * Draws a polygon which is composed of many different squares at each location in the specified
+     * list of locations, where location is a point on the game grid, not a screen point.
      *
-     * @param location  The location at which to draw the borders.
+     * @param locations  The locations of each square that makes up the polygon.
+     * @param color      The color of the shape to draw.
      */
-    public void drawAllBorders(Vector2D location) {
-        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-            drawBorder(direction, location);
+    public void drawPolygon(List<Vector2D> locations, int color, Canvas canvas) {
+
+
+        List<Vector2D> screenList = new ArrayList<>();
+        for (Vector2D location : locations) {
+            screenList.add(levelView.getScreenVector(location));
         }
+
+        //shader info - possible remove
+        List<Vector2D> bounds = Vector2D.getBounds(screenList);
+        Shader shader = new LinearGradient(bounds.get(0).getX(), bounds.get(0).getY(),
+                bounds.get(1).getX(), bounds.get(1).getY(), color,
+                DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+        paint.setShader(shader);
+        //end shader
+
+        path.reset();
+        for (Vector2D screenLocation : screenList) {
+            int x = screenLocation.getX();
+            int y = screenLocation.getY();
+
+            if (path.isEmpty()) {
+                path.moveTo(x, y);
+            }
+            else {
+                path.lineTo(x, y);
+            }
+        }
+        path.close();
+        canvas.drawPath(path, paint);
+
+        //draw border
+        canvas.drawPath(path, borderPaint);
     }
 
-    /**
-     * Draws all of the borders in the directions found in the specified list, at the
-     * specified location.
-     *
-     * @param directions    A Collection of Directions in which to draw borders.
-     * @param location      The location in which to draw the borders.
-     */
-    public void drawBorders(Collection<Vector2D.Direction> directions, Vector2D location) {
-        for (Vector2D.Direction direction : directions) {
-            drawBorder(direction, location);
-        }
-    }
 
-    /**
-     * Draws a border in the specified direction, relative to the center of the square.
-     *
-     * @param direction     The direction defining which edge should have a border.
-     * @param location      The location at which to draw the border.
-     */
-    public void drawBorder(Vector2D.Direction direction, Vector2D location) {
-
-        Vector2D screenLocation = levelView.getScreenVector(location);
-        int x = screenLocation.getX();
-        int y = screenLocation.getY();
-        int width = levelView.getActorUnit();
-        Paint paint = new Paint();
-        paint.setColor(ColorHelper.getBorderColor());
-        paint.setAlpha(85);
-        paint.setStrokeWidth(borderWidth);
-
-        switch (direction) {
-           case UP:
-                canvas.drawLine(x, y, x + width, y, paint);
-                break;
-            case DOWN:
-                canvas.drawLine(x, y + width, x + width, y + width, paint);
-                break;
-            case RIGHT:
-                canvas.drawLine(x + width, y, x + width, y + width, paint);
-                break;
-            case LEFT:
-                canvas.drawLine(x, y, x, y + width, paint);
-                break;
-            default:
-                break;
-
-        }
-    }
+//    /**
+//     * Draws all four borders at the specified location, forming a square.
+//     *
+//     * @param location  The location at which to draw the borders.
+//     */
+//    public void drawAllBorders(Vector2D location) {
+//        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
+//            drawBorder(direction, location);
+//        }
+//    }
+//
+//    /**
+//     * Draws all of the borders in the directions found in the specified list, at the
+//     * specified location.
+//     *
+//     * @param directions    A Collection of Directions in which to draw borders.
+//     * @param location      The location in which to draw the borders.
+//     */
+//    public void drawBorders(Collection<Vector2D.Direction> directions, Vector2D location) {
+//        for (Vector2D.Direction direction : directions) {
+//            drawBorder(direction, location);
+//        }
+//    }
+//
+//    /**
+//     * Draws a border in the specified direction, relative to the center of the square.
+//     *
+//     * @param direction     The direction defining which edge should have a border.
+//     * @param location      The location at which to draw the border.
+//     */
+//    public void drawBorder(Vector2D.Direction direction, Vector2D location) {
+//
+//
+//        Vector2D screenLocation = levelView.getScreenVector(location);
+//        float x = screenLocation.getX();
+//        float y = screenLocation.getY();
+//        float width = levelView.getActorUnit();
+//        Paint paint = new Paint();
+//        paint.setColor(ColorHelper.getBorderColor());
+//        paint.setAlpha(borderAlpha);
+//        paint.setStrokeWidth(borderWidth);
+//
+//        switch (direction) {
+//           case UP:
+//                canvas.drawLine(x+1, y, x + width, y, paint);
+//                break;
+//            case DOWN:
+//                canvas.drawLine(x, y + width, x + width, y + width, paint);
+//                break;
+//            case RIGHT:
+//                canvas.drawLine(x + width, y, x + width, y + width, paint);
+//                break;
+//            case LEFT:
+//                canvas.drawLine(x, y+1, x, y + width, paint);
+//                break;
+//            default:
+//
+//                break;
+//
+//        }
+//    }
 
     /**
      * Draws the specified Drawable at the given location.
@@ -151,7 +274,8 @@ public class DrawingHelper {
      * @param icon      The icon to draw.
      * @param location  The location to draw the icon.
      */
-    public void drawIcon(Drawable icon, Vector2D location) {
+    public void drawIcon(String tag, Vector2D location, Canvas canvas) {
+        Drawable icon = levelView.getIcon(tag);
         Vector2D screenLocation = levelView.getScreenVector(location);
         int x = screenLocation.getX();
         int y = screenLocation.getY();
@@ -159,4 +283,201 @@ public class DrawingHelper {
         icon.setBounds(x, y, x + width, y + width);
         icon.draw(canvas);
     }
+
+    /**
+     * Given a color, returns a slightly darker version of that color.
+     *
+     * @param color The original color
+     * @return      A slightly darker version of the original color.
+     */
+    public static int getGradientTint(int color) {
+        int tintAmount = 52;
+
+        int alpha = Color.alpha(color);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        r = r > tintAmount ? r - tintAmount : 0;
+        g = g > tintAmount ? g - tintAmount : 0;
+        b = b > tintAmount ? b - tintAmount : 0;
+
+        return Color.argb(alpha, r, g, b);
+
+    }
+
+    /**
+     * Given the upper-left corner of a square, returns all four points in the square in clockwise
+     * order, starting from the upper-left, where each side is 1 unit long.
+     *
+     * @param origin    The upper-left corner.
+     * @return          A list of points forming a square, in clockwise order starting from the
+     *                  given origin.
+     */
+    public static List<Vector2D> expandOrigin(Vector2D origin) {
+        List<Vector2D> expandedList = new LinkedList<>();
+        expandedList.add(origin);
+        expandedList.add(origin.getPointInDirection(Vector2D.Direction.RIGHT));
+        expandedList.add(origin.getPointFromDirections(Vector2D.Direction.RIGHT, Vector2D.Direction.DOWN));
+        expandedList.add(origin.getPointInDirection(Vector2D.Direction.DOWN));
+        return expandedList;
+    }
+
+
+    /**
+     * Given a list of locations representing squares, returns a list of locations forming
+     * the outside path of the polygon.  Starts from the first point in the specified list and
+     * proceeds around the polygon in clockwise order.
+     *
+     * @param origins   The location of the upper-left points of squares forming the polygon.
+     * @return          A list of points around the polygon, in clockwise order.
+     */
+    public static List<Vector2D> getPath(List<Vector2D> origins) {
+
+        //The below algorithm is a bit difficult to understand, but here's how it works.  It starts
+        //with a random point in the origins list.  It converts this single point (the location of
+        //the block) into four points in a path, i.e. an order that the drawing function will use
+        //when drawing the shape.  It then looks for an adjacent location point, converts that
+        //adjacent point into another path, and then merges that adjacent point with the main path,
+        //without disrupting the path.  It then does the same for all adjacent points, in breadth-
+        //first traversal through all the given points.  The result is a path going around the
+        //squares, in clockwise order.
+
+        List<Vector2D> path = DrawingHelper.expandOrigin(origins.get(0));
+        List<Vector2D> visited = new ArrayList<>();
+        visited.add(origins.get(0));
+        List<Vector2D> lookQueue = new ArrayList<>();
+        lookQueue.add(origins.get(0));
+
+        while (!visited.containsAll(origins) && lookQueue.size() > 0) {
+            List<Vector2D> nextQueue = new ArrayList<>();
+            for (Vector2D point : lookQueue) {
+                for (Vector2D.Direction direction : Vector2D.Direction.values()) {
+                    Vector2D adjacent = point.getPointInDirection(direction);
+                    if (origins.contains(adjacent) && !visited.contains(adjacent)) {
+                        List<Vector2D> toMerge = DrawingHelper.expandOrigin(adjacent);
+                        List<Vector2D> intersections = getSide(point, direction);
+                        mergePaths(path, toMerge, intersections);
+                        visited.add(adjacent);
+                        nextQueue.add(adjacent);
+                    }
+                }
+            }
+            lookQueue = nextQueue;
+        }
+
+       // path.add(path.get(0));
+        return path;
+    }
+
+
+    /**
+     * Given a point and a direction, returns the points of the side of the square formed with the
+     * given point as its upper left point, in clockwise order.
+     *
+     * @param point     The point representing the upper left of the square.
+     * @param direction The direction corresponding to the side of the square.
+     * @return  Returns a list of the two points of the side, in clockwise order around the square.
+     */
+    private static List<Vector2D> getSide(Vector2D point, Vector2D.Direction direction) {
+        List<Vector2D> result = new ArrayList<>();
+        switch (direction) {
+
+            case UP:
+                result.add(point);
+                result.add(point.getPointInDirection(Vector2D.Direction.RIGHT));
+                break;
+            case RIGHT:
+                result.add(point.getPointInDirection(Vector2D.Direction.RIGHT));
+                result.add(point.getPointFromDirections(Vector2D.Direction.RIGHT, Vector2D.Direction.DOWN));
+                break;
+            case DOWN:
+                result.add(point.getPointFromDirections(Vector2D.Direction.RIGHT, Vector2D.Direction.DOWN));
+                result.add(point.getPointInDirection(Vector2D.Direction.DOWN));
+                break;
+            case LEFT:
+                result.add(point.getPointInDirection(Vector2D.Direction.DOWN));
+                result.add(point);
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+
+
+    /**
+     * Given a main path and a path to be absorbed (where path here is a list of Vector2Ds marking
+     * the perimeter around a shape in counterclockwise order), merges the two paths into the main
+     * path, resulting in a path that circumscribes both of the specified paths in clockwise order.
+     *
+     * @param mainPath      The main path, which will absorb the other.
+     * @param absorbed      The path to be absorbed.
+     * @param intersections The intersection points of the two paths, in clockwise order.
+     */
+
+    public static void mergePaths(List<Vector2D> mainPath,
+                                  List<Vector2D> absorbed,
+                                  List<Vector2D> intersections) {
+
+        int index = mainPath.indexOf(intersections.get(0)) + 1;
+
+        //merge two paths
+        Vector2D current = getNextFromRing(intersections.get(0), absorbed);
+        while (!current.equals(intersections.get(1))) {
+            mainPath.add(index, current);
+            index += 1;
+            current = getNextFromRing(current, absorbed);
+
+        }
+
+        //remove "kinks", i.e. inner points formed when the absorbed forms a pinched off area
+        //in the center of 4-square sections.
+        current = mainPath.get(0);
+        index = 0;
+        for (int i = 0; i < mainPath.size(); i++) {
+            Vector2D twoAhead = getNextFromRing(getNextFromRing(current, mainPath), mainPath);
+            if (current.equals(twoAhead)) {
+                mainPath.remove(index);
+                mainPath.remove(index);
+            }
+            current = getNextFromRing(current, mainPath);
+            index += 1;
+        }
+
+    }
+
+    /**
+     * Given a list of Vector2Ds and a Vector2D in that list, returns the next item in the list,
+     * or the first item if the current item is the last item.  Essentially, makes the list act
+     * as a sort of ring data structure.
+     *
+     * @param link  The current item in the ring, for which to get the next item.
+     * @param ring  The list which contains the items.
+     * @return      The next item in the list, in ring-form (i.e. if at the end, gets the first)
+     */
+    private static Vector2D getNextFromRing(Vector2D link, List<Vector2D> ring) {
+        int index = ring.indexOf(link);
+
+        if (index >= ring.size() - 1) {
+            return ring.get(0);
+        }
+        else {
+            return ring.get(index + 1);
+        }
+    }
+
+    public static List<Vector2D> getIntersections(List<Vector2D> first, List<Vector2D> second) {
+        List<Vector2D> result = new ArrayList<>();
+        for (Vector2D point : first) {
+            for (Vector2D other : second) {
+                if (point.equals(other)) {
+                    result.add(point);
+                }
+            }
+        }
+        return result;
+    }
+
 }

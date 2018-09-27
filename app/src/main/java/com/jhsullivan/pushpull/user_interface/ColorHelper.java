@@ -2,6 +2,10 @@ package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Color;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A utility class for getting access to colors from anywhere, without accessing the resource
  * file.  This may be deprecated in favor of the XML resources later.  All methods simply get
@@ -28,7 +32,6 @@ public class ColorHelper {
         return 0xFFF70025;
 
     }
-
     public static int getPullColor() {
         return 0xFF375E97;
     }
@@ -43,5 +46,9 @@ public class ColorHelper {
 
     public static int getWallColor() {
         return Color.DKGRAY;
+    }
+
+    public static int getActivityColor() {
+        return 0xfff4f4e3;
     }
 }

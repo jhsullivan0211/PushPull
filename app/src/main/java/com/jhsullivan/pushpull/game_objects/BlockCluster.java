@@ -4,6 +4,7 @@ package com.jhsullivan.pushpull.game_objects;
 
 
     import android.graphics.Canvas;
+    import android.graphics.Color;
 
 
     import com.jhsullivan.pushpull.game_logic.Vector2D;
@@ -13,6 +14,7 @@ package com.jhsullivan.pushpull.game_objects;
 
     import java.util.ArrayList;
     import java.util.Collections;
+    import java.util.LinkedList;
     import java.util.List;
 
 /**
@@ -25,8 +27,14 @@ public class BlockCluster implements GameObject{
     private Vector2D location;
     private List<BlockCluster> clusters = new ArrayList<>();
     private boolean move = true;
-    private Character clusterID;
+    protected Character clusterID;
     private Vector2D undoLocation;
+    private List<Vector2D> path;
+    private boolean isMajor = false;
+
+
+
+
 
     /**
      *  Basic constructor which takes in a clusterID to assign to this block.
@@ -58,35 +66,51 @@ public class BlockCluster implements GameObject{
     }
 
     /**
-     * Draws the game object onto the specified Canvas using information from the specified
-     * LevelView.
+     * Draws the game object onto the specified Canvas using the specified DrawingHelper.
      *
-     * @param levelView     The LevelView from which to get drawing information.
+     * @param drawingHelper     The DrawingHelper to use to help draw the object.
      * @param canvas        The Canvas on which to draw.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawSquareBody(color, location);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
 
-        List<Vector2D.Direction> borderDirections = new ArrayList<>();
-        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-            if (!hasAdjacentCluster(direction)) {
-                borderDirections.add(direction);
-            }
+        if (isMajor) {
+            drawingHelper.drawPolygon(path, color, canvas);
         }
 
-        drawingHelper.drawBorders(borderDirections, location);
+//        List<Vector2D.Direction> borderDirections = new ArrayList<>();
+//        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
+//            if (!hasAdjacentCluster(direction)) {
+//                borderDirections.add(direction);
+//            }
+//        }
+//
+//        drawingHelper.drawBorders(borderDirections, location);
     }
 
     /**
-     * Sets the location of this game object.
+     * Sets the location of this game object.  If this is the major BlockCluster, moves the path
+     * the same amount.
      *
      * @param location  The value for which to set the GameObject's location attribute.
      */
     @Override
     public void setLocation(Vector2D location) {
-        this.location = location;
+        if (isMajor) {
+            Vector2D previous = this.location;
+            this.location = location;
+            Vector2D difference = Vector2D.subtract(location, previous);
+
+            for (int i = 0; i < path.size(); i++) {
+                Vector2D replacement = Vector2D.add(path.get(i), difference);
+                path.set(i, replacement);
+            }
+
+        }
+        else {
+            this.location = location;
+        }
+
     }
 
 
@@ -161,5 +185,32 @@ public class BlockCluster implements GameObject{
     public void setUndoLocation(Vector2D undoLocation) {
         this.undoLocation = undoLocation;
     }
+
+    /**
+     *
+     * @return  Returns the color of this object.
+     */
+    @Override
+    public int getColor() {
+        return this.color;
+    }
+
+
+
+
+    public void setPath(List<Vector2D> path) {
+        this.path = path;
+    }
+
+    public void setMajor(boolean isMajor) {
+        this.isMajor = isMajor;
+    }
+
+    public boolean getMajor() {
+        return isMajor;
+    }
+
+
+
 
 }

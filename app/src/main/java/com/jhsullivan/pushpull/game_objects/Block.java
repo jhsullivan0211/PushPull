@@ -25,16 +25,14 @@ public class Block implements GameObject {
 
 
     /**
-     * Draws the block onto the specified LevelView.
+     * Draws the block onto the specified LevelView using the specified DrawingHelper.
      *
-     * @param levelView     The LevelView required for drawing information.
+     * @param drawingHelper    The DrawingHelper to use to help draw the object.
      * @param canvas        The canvas on which to draw.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawSquareBody(color, location);
-        drawingHelper.drawAllBorders(location);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
+        drawingHelper.drawSquareBody(color, location, canvas);
     }
 
     /**
@@ -93,6 +91,15 @@ public class Block implements GameObject {
     @Override
     public void setUndoLocation(Vector2D undoLocation) {
         this.undoLocation = undoLocation;
+    }
+
+    /**
+     *
+     * @return  Returns the color of this object.
+     */
+    @Override
+    public int getColor() {
+        return this.color;
     }
 
 

@@ -1,10 +1,11 @@
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-qx,ox,xx,1x,xx,xx,xx,xx,bx,xx
-xx,ox,xx,1x,xx,bx,ox,ox,ox,xx
-2x,2o,ox,xx,xx,xx,xx,bx,xx,xx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
-wx,wx,wx,wx,wx,wx,wx,wx,wx,wx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,rx,xx,bx,xx,bx,xx,bx,xx,bx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,bx,xx,bx,xx,xx,xx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,bx,xx,xx,xx,bx,ox,ox,ox,ox
+xx,xx,xx,xx,xx,ox,ox,xx,xx,ox
+xx,bx,xx,xx,xx,ox,xx,bx,xx,xx
+xx,xx,xx,xx,xx,ox,xx,xx,xx,xx
+xx,bx,xx,xx,xx,ox,ox,xx,xx,xx
+>A yellow square moves with all connected blocks.

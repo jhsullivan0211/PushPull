@@ -4,7 +4,7 @@ xx,xx,1x,1x,1x,1x,1x,1x,xx,xx
 xx,xx,1x,Px,xx,xx,Qx,1x,xx,xx
 ox,ox,1x,xx,bo,bo,xx,1x,xx,xx
 ox,ox,1x,xx,bo,bo,xx,1x,xx,xx
-xx,xx,1x,px,xx,xx,Rx,1x,xx,xx
-xx,xx,1x,1x,1x,1x,1x,1x,xx,xx
+xx,xx,1x,Rx,xx,xx,px,1x,xx,xx
+xx,xx,1x,1x,1x,1x,1x,xx,xx,xx
 xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
-xx,xx,xx,xx,xx,xx,xx,xx,xx,xx
+xx,xx,xx,xx,xx,xx,xx,xx,xx,bx

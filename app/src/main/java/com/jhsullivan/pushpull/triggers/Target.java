@@ -74,20 +74,19 @@ public class Target implements Trigger {
      * @param canvas        The Canvas on which to draw the target.
      */
     @Override
-    public void draw(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(levelView.targetIcon, location);
+    public void draw(DrawingHelper drawingHelper, Canvas canvas) {
+        drawingHelper.drawIcon("target", location, canvas);
+
     }
 
+
     /**
-     * Draws the success icon onto the target when a block is moved onto it.
      *
-     * @param levelView     The LevelView from which to get drawing specifications.
-     * @param canvas        The Canvas on which to draw the target.
+     * @return  Returns the color of this object.
      */
-    public void drawSuccessIcon(LevelView levelView, Canvas canvas) {
-        DrawingHelper drawingHelper = new DrawingHelper(levelView, canvas);
-        drawingHelper.drawIcon(levelView.coveredTargetIcon, location);
+    @Override
+    public int getColor() {
+        return 0;
     }
 
 
