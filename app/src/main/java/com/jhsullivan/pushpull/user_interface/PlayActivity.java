@@ -10,7 +10,6 @@ import android.media.MediaPlayer;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -22,7 +21,6 @@ import com.jhsullivan.pushpull.game_logic.LevelLoadException;
 import com.jhsullivan.pushpull.game_logic.LevelManager;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -385,6 +383,7 @@ public class PlayActivity extends AppCompatActivity {
      * being on and sound being off, updating the button graphic accordingly.
      */
     public void toggleSound() {
+
 
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {

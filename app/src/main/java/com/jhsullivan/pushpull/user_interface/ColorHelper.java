@@ -2,9 +2,6 @@ package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Color;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A utility class for getting access to colors from anywhere, without accessing the resource

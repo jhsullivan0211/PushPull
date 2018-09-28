@@ -2,15 +2,15 @@ package com.jhsullivan.pushpull.game_objects;
 
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-
+import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.ColorHelper;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-import com.jhsullivan.pushpull.user_interface.LevelView;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A GameObject which does not move at all, only takes up space.
@@ -21,8 +21,7 @@ public class Wall implements GameObject{
     private int color = ColorHelper.getWallColor();
     private Vector2D location;
     private List<Wall> walls = new ArrayList<>();
-    private List<Vector2D> path;
-    private boolean isMajor;
+
 
 
     /**
@@ -53,6 +52,36 @@ public class Wall implements GameObject{
     }
 
     /**
+     * Returns all walls that are contiguous to the specified wall in the specified level.
+     *
+     * @param target    The GameObject from which to get all attached.
+     * @param level     The Level to query for attached objects.
+     * @return          Returns a collection of game objects attached to the supplied GameObject.
+     */
+    public Collection<Wall> getContiguousWalls(Level level) {
+
+        Set<Wall> attached = new HashSet<>();
+        Set<Wall> next = new HashSet<>();
+        Set<Wall> frontier = new HashSet<>();
+        next.add(this);
+
+        do {
+            for (Wall obj : next) {
+                attached.add(obj);
+                for (GameObject adj : level.getAdjacentObjects(obj)) {
+                    if ((adj instanceof Wall) && !attached.contains(adj) ) {
+                        frontier.add((Wall) adj);
+                    }
+                }
+            }
+            next = frontier;
+            frontier = new HashSet<>();
+        } while (next.size() > 0);
+
+        return attached;
+    }
+
+    /**
      * @return  Returns this wall's location.
      */
     @Override
@@ -68,9 +97,6 @@ public class Wall implements GameObject{
      */
     @Override
     public void draw(DrawingHelper drawingHelper, Canvas canvas) {
-//        if (isMajor) {
-//            drawingHelper.drawPolygon(path, color, canvas);
-//        }
 
         drawingHelper.drawSquareBody(color, location, canvas);
     }
@@ -132,16 +158,8 @@ public class Wall implements GameObject{
         return this.color;
     }
 
-    public void setPath(List<Vector2D> path) {
-        this.path = path;
-    }
 
-    public boolean isMajor() {
-        return this.isMajor;
-    }
 
-    public void setMajor(boolean major) {
-        this.isMajor = major;
-    }
+
 
 }

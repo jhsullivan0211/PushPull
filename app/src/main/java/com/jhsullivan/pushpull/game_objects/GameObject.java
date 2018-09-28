@@ -4,8 +4,6 @@ package com.jhsullivan.pushpull.game_objects;
 import com.jhsullivan.pushpull.game_logic.Actor;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 
-import java.io.Serializable;
-
 
 /**
  * This interface defines Actors that take up space in the level and can move around.

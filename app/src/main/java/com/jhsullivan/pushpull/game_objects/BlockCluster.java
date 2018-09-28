@@ -4,17 +4,11 @@ package com.jhsullivan.pushpull.game_objects;
 
 
     import android.graphics.Canvas;
-    import android.graphics.Color;
-
-
     import com.jhsullivan.pushpull.game_logic.Vector2D;
     import com.jhsullivan.pushpull.user_interface.ColorHelper;
     import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-    import com.jhsullivan.pushpull.user_interface.LevelView;
-
     import java.util.ArrayList;
     import java.util.Collections;
-    import java.util.LinkedList;
     import java.util.List;
 
 /**
@@ -78,14 +72,6 @@ public class BlockCluster implements GameObject{
             drawingHelper.drawPolygon(path, color, canvas);
         }
 
-//        List<Vector2D.Direction> borderDirections = new ArrayList<>();
-//        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-//            if (!hasAdjacentCluster(direction)) {
-//                borderDirections.add(direction);
-//            }
-//        }
-//
-//        drawingHelper.drawBorders(borderDirections, location);
     }
 
     /**

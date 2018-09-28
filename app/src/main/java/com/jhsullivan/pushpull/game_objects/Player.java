@@ -6,9 +6,6 @@ import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.ColorHelper;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-import com.jhsullivan.pushpull.user_interface.LevelView;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

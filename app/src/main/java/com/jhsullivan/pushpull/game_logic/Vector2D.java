@@ -428,7 +428,8 @@ public class Vector2D implements Serializable{
     /**
      * Given a group of Vector2D points, returns the upper left and bottom right points of the
      * smallest rectangle that contains all of the points.
-     * @param points
+     *
+     * @param points        The list of points from which to calculate the bounds.
      * @return
      */
     public static List<Vector2D> getBounds(List<Vector2D> points) {

@@ -7,7 +7,6 @@ import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-import com.jhsullivan.pushpull.user_interface.LevelView;
 
 /**
  * Represents the target that must be covered with a block to win.
@@ -78,7 +77,6 @@ public class Target implements Trigger {
         drawingHelper.drawIcon("target", location, canvas);
 
     }
-
 
     /**
      *

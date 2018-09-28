@@ -2,22 +2,15 @@ package com.jhsullivan.pushpull.user_interface;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
-
 import com.jhsullivan.pushpull.game_logic.Vector2D;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -30,7 +23,6 @@ public class DrawingHelper {
     private enum Shape {CIRCLE, SQUARE};
 
     private LevelView levelView;
-    private float radius = 12.0f; //was 10.0
     private Paint paint = new Paint();
     private Path path = new Path();
     int borderColor = Color.BLACK;
@@ -38,7 +30,8 @@ public class DrawingHelper {
     private int borderAlpha = 85;
     private int borderWidthFactor = 325;
     private Paint borderPaint = new Paint();
-
+    private int basicTintAmount = 62;
+    private int highTintAmount = 72;
 
     /**
      * Basic constructor for the DrawingHelper class.  Assigns parameters to member variables.
@@ -50,18 +43,13 @@ public class DrawingHelper {
     public DrawingHelper(LevelView levelView) {
         this.levelView = levelView;
         this.borderWidth = levelView.getSize() / borderWidthFactor;
-
-        int width = levelView.getActorUnit();
         paint.setAntiAlias(true);
-
-        CornerPathEffect rounding = new CornerPathEffect(radius);
-        paint.setPathEffect(rounding);
         borderPaint.setColor(borderColor);
         borderPaint.setAlpha(borderAlpha);
         borderPaint.setStrokeWidth(borderWidth);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setAntiAlias(true);
-        borderPaint.setPathEffect(rounding);
+
 
     }
 
@@ -73,35 +61,6 @@ public class DrawingHelper {
         paint.setColor(color);
     }
 
-//    /**
-//     * Prepares the shader for gradients and loads it into the paint field.
-//     *
-//     * @param x  The x-coordinate of the start of the gradient.
-//     * @param y  The y-coordinate of the start of the gradient.
-//     * @param color  The color of the start, i.e. the lightest part, of the gradient.
-//     */
-//    public void prepareShader(int x, int y, int color) {
-//        int width = levelView.getActorUnit();
-//        Shader shader = new LinearGradient(x, y, x+width, y+width, Color.WHITE, getGradientTint(Color.LTGRAY), Shader.TileMode.CLAMP);
-//        paint.setShader(shader);
-//    }
-
-    public void setRound(boolean round) {
-        if (round) {
-            CornerPathEffect rounding = new CornerPathEffect(radius);
-            paint.setPathEffect(rounding);
-            borderPaint.setPathEffect(rounding);
-        }
-        else {
-            paint.setPathEffect(null);
-            borderPaint.setPathEffect(null);
-            borderPaint.setAlpha(0);
-        }
-    }
-
-    public void loadShader(Shader shader) {
-        paint.setShader(shader);
-    }
 
     /**
      * Draws a filled-in square that is the specified color, at the specified location.
@@ -139,12 +98,11 @@ public class DrawingHelper {
         int width = levelView.getActorUnit();
         int circleOffset = levelView.getActorUnit() / 10;
 
-        //Test creating new shader on each draw
         Shader shader = new LinearGradient(x, y, x + width, y + width, color,
-                DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+                DrawingHelper.getGradientTint(color, highTintAmount), Shader.TileMode.CLAMP);
 
         paint.setShader(shader);
-        //end test
+
         if (shape == Shape.SQUARE) {
             path.reset();
             path.moveTo(x, y);
@@ -178,13 +136,12 @@ public class DrawingHelper {
             screenList.add(levelView.getScreenVector(location));
         }
 
-        //shader info - possible remove
         List<Vector2D> bounds = Vector2D.getBounds(screenList);
         Shader shader = new LinearGradient(bounds.get(0).getX(), bounds.get(0).getY(),
                 bounds.get(1).getX(), bounds.get(1).getY(), color,
-                DrawingHelper.getGradientTint(color), Shader.TileMode.CLAMP);
+                DrawingHelper.getGradientTint(color, basicTintAmount), Shader.TileMode.CLAMP);
         paint.setShader(shader);
-        //end shader
+
 
         path.reset();
         for (Vector2D screenLocation : screenList) {
@@ -204,69 +161,6 @@ public class DrawingHelper {
         //draw border
         canvas.drawPath(path, borderPaint);
     }
-
-
-//    /**
-//     * Draws all four borders at the specified location, forming a square.
-//     *
-//     * @param location  The location at which to draw the borders.
-//     */
-//    public void drawAllBorders(Vector2D location) {
-//        for (Vector2D.Direction direction : Vector2D.Direction.values()) {
-//            drawBorder(direction, location);
-//        }
-//    }
-//
-//    /**
-//     * Draws all of the borders in the directions found in the specified list, at the
-//     * specified location.
-//     *
-//     * @param directions    A Collection of Directions in which to draw borders.
-//     * @param location      The location in which to draw the borders.
-//     */
-//    public void drawBorders(Collection<Vector2D.Direction> directions, Vector2D location) {
-//        for (Vector2D.Direction direction : directions) {
-//            drawBorder(direction, location);
-//        }
-//    }
-//
-//    /**
-//     * Draws a border in the specified direction, relative to the center of the square.
-//     *
-//     * @param direction     The direction defining which edge should have a border.
-//     * @param location      The location at which to draw the border.
-//     */
-//    public void drawBorder(Vector2D.Direction direction, Vector2D location) {
-//
-//
-//        Vector2D screenLocation = levelView.getScreenVector(location);
-//        float x = screenLocation.getX();
-//        float y = screenLocation.getY();
-//        float width = levelView.getActorUnit();
-//        Paint paint = new Paint();
-//        paint.setColor(ColorHelper.getBorderColor());
-//        paint.setAlpha(borderAlpha);
-//        paint.setStrokeWidth(borderWidth);
-//
-//        switch (direction) {
-//           case UP:
-//                canvas.drawLine(x+1, y, x + width, y, paint);
-//                break;
-//            case DOWN:
-//                canvas.drawLine(x, y + width, x + width, y + width, paint);
-//                break;
-//            case RIGHT:
-//                canvas.drawLine(x + width, y, x + width, y + width, paint);
-//                break;
-//            case LEFT:
-//                canvas.drawLine(x, y+1, x, y + width, paint);
-//                break;
-//            default:
-//
-//                break;
-//
-//        }
-//    }
 
     /**
      * Draws the specified Drawable at the given location.
@@ -290,9 +184,11 @@ public class DrawingHelper {
      * @param color The original color
      * @return      A slightly darker version of the original color.
      */
-    public static int getGradientTint(int color) {
-        int tintAmount = 52;
+    public static int getGradientTint(int color, int tintAmount) {
 
+        if (color == ColorHelper.getPushColor()) {
+            tintAmount += 15;
+        }
         int alpha = Color.alpha(color);
         int r = Color.red(color);
         int g = Color.green(color);
@@ -334,14 +230,14 @@ public class DrawingHelper {
      */
     public static List<Vector2D> getPath(List<Vector2D> origins) {
 
-        //The below algorithm is a bit difficult to understand, but here's how it works.  It starts
-        //with a random point in the origins list.  It converts this single point (the location of
-        //the block) into four points in a path, i.e. an order that the drawing function will use
-        //when drawing the shape.  It then looks for an adjacent location point, converts that
-        //adjacent point into another path, and then merges that adjacent point with the main path,
-        //without disrupting the path.  It then does the same for all adjacent points, in breadth-
-        //first traversal through all the given points.  The result is a path going around the
-        //squares, in clockwise order.
+        /*The below algorithm is a bit difficult to understand, but here's how it works.  It starts
+        with a random point in the origins list.  It converts this single point (the location of
+        the block) into four points in a path, i.e. an order that the drawing function will use
+        when drawing the shape.  It then looks for an adjacent location point, converts that
+        adjacent point into another path, and then merges that adjacent point with the main path,
+        without disrupting the path.  It then does the same for all adjacent points, in breadth-
+        first traversal through all the given points.  The result is a path going around the
+        squares, in clockwise order. */
 
         List<Vector2D> path = DrawingHelper.expandOrigin(origins.get(0));
         List<Vector2D> visited = new ArrayList<>();
@@ -468,6 +364,14 @@ public class DrawingHelper {
         }
     }
 
+    /**
+     * Given two lists of points, returns a list of intersection points, in the order that they
+     * occur in the first list.
+     *
+     * @param first     The first list of Vector2D points.
+     * @param second    The second list of Vector2D points.
+     * @return
+     */
     public static List<Vector2D> getIntersections(List<Vector2D> first, List<Vector2D> second) {
         List<Vector2D> result = new ArrayList<>();
         for (Vector2D point : first) {

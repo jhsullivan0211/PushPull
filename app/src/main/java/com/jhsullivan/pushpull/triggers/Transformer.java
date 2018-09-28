@@ -1,20 +1,14 @@
 package com.jhsullivan.pushpull.triggers;
 
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-
-import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Level;
 import com.jhsullivan.pushpull.game_objects.GameObject;
 import com.jhsullivan.pushpull.game_objects.Player;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.ColorHelper;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-import com.jhsullivan.pushpull.user_interface.LevelView;
-import com.jhsullivan.pushpull.user_interface.PlayActivity;
+
 
 /**
  * Transformer trigger, which transforms any player that moves onto it into the type of this

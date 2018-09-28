@@ -2,7 +2,6 @@ package com.jhsullivan.pushpull.user_interface;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 
 /**

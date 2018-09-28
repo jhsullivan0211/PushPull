@@ -1,8 +1,6 @@
 package com.jhsullivan.pushpull.game_logic;
 
 
-    import android.util.Log;
-
     import com.jhsullivan.pushpull.game_objects.Block;
     import com.jhsullivan.pushpull.game_objects.BlockCluster;
     import com.jhsullivan.pushpull.game_objects.GameObject;
@@ -12,13 +10,13 @@ package com.jhsullivan.pushpull.game_logic;
     import com.jhsullivan.pushpull.triggers.Transformer;
     import com.jhsullivan.pushpull.triggers.Trigger;
     import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-
     import java.util.ArrayList;
     import java.util.Collection;
     import java.util.Collections;
     import java.util.HashMap;
     import java.util.List;
     import java.util.Map;
+
 
 
 /**
@@ -61,8 +59,6 @@ public class Level {
     private boolean isComplete = false;
     private boolean finishedLoading = false;
     private String message = "";
-
-    private Map<GameObject, Vector2D> clusterBoundsMap = new HashMap<>();
 
 
     /**
@@ -149,14 +145,8 @@ public class Level {
            doShift = !doShift;
         }
 
-        boolean first = true;
         for (Wall wall : walls) {
            wall.groupWalls(walls);
-           if (first) {
-               wall.setMajor(true);
-               first = false;
-           }
-
         }
 
         for (GameObject obj : gameObjects) {
@@ -278,10 +268,6 @@ public class Level {
         }
 
        update();
-    }
-
-    public void print(String message) {
-        Log.d("PRINT", message);
     }
 
     /**
@@ -441,8 +427,6 @@ public class Level {
     }
 
 
-
-
     /**
      * Attempts a single iteration of movement of all the players in a specified direction.
      * Moves all of the GRABALL type players first, then the remaining players.  Collects
@@ -484,7 +468,6 @@ public class Level {
             count = 0;
             for (Player player : players) {
                 if (player.canMove() && player.getType() == Player.Type.PULL) {
-                    //TODO: evaluate following if statement's necessity
                     if (player.move(moveDirection, this)) {
                         count += 1;
                     }
@@ -562,7 +545,6 @@ public class Level {
     public void update() {
         for (Trigger trigger : triggers) {
             GameObject filler = filledPositions.get(trigger.getLocation());
-            //TODO: fix this garbage
             if (trigger.isFilled()) {
                 trigger.act(filler);
             }
@@ -685,7 +667,4 @@ public class Level {
         return Collections.unmodifiableList(targets);
     }
 
-    public Map<GameObject, Vector2D> getClusterBoundsMap() {
-        return clusterBoundsMap;
-    }
 }

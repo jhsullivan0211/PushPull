@@ -2,14 +2,9 @@ package com.jhsullivan.pushpull.game_objects;
 
 
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-
-import com.jhsullivan.pushpull.R;
 import com.jhsullivan.pushpull.game_logic.Vector2D;
 import com.jhsullivan.pushpull.user_interface.ColorHelper;
 import com.jhsullivan.pushpull.user_interface.DrawingHelper;
-import com.jhsullivan.pushpull.user_interface.LevelView;
-import com.jhsullivan.pushpull.user_interface.PlayActivity;
 
 /**
  * A concrete implementation of GameObject, which is to be moved around by the player and put
