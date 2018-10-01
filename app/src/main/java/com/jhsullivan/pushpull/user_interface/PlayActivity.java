@@ -384,7 +384,6 @@ public class PlayActivity extends AppCompatActivity {
      */
     public void toggleSound() {
 
-
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {
             soundButton.setImageResource(R.drawable.sound_off_icon);

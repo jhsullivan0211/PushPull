@@ -1,6 +1,7 @@
 package com.jhsullivan.pushpull.user_interface;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import com.jhsullivan.pushpull.R;
@@ -100,15 +102,21 @@ public class LevelView extends View {
         coveredTargetIcon = getResources().getDrawable(R.drawable.check);
         targetIcon = getResources().getDrawable(R.drawable.target_icon_small);
 
-        if (getResources().getDisplayMetrics().densityDpi <= 240) {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        if (metrics.densityDpi <= 240) {
             textSize = 14;
+        }
+
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            textSize *= 3;
         }
 
         textPixels = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 textSize, getResources().getDisplayMetrics());
 
 
-
+        textPaint.setAntiAlias(true);
         textPaint.setTextSize(textPixels);
 
         this.setWillNotDraw(false);
