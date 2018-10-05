@@ -1,5 +1,5 @@
 # PushPull
-A puzzle app for Android smartphones, as seen on the Google Play Store (pending).
+A puzzle app for Android smartphones, as seen on the Google Play Store.
 
 ## Basics
 
