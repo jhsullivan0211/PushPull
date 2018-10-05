@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -37,7 +38,6 @@ public class StartupActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
         currentLevelIndex = preferences.getInt(ActivityUtility.currentLevelID, 0);
 
-
         ImageButton playButton = findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,11 +55,12 @@ public class StartupActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * The method called when this Activity is resumed.  Loads app data to get the current level.
      */
     @Override
-    protected  void onResume() {
+    protected void onResume() {
         super.onResume();
         SharedPreferences preferences = getSharedPreferences(ActivityUtility.dataFileName, 0);
         currentLevelIndex = preferences.getInt(ActivityUtility.currentLevelID, 0);

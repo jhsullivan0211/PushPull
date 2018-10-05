@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -102,6 +101,7 @@ public class PlayActivity extends AppCompatActivity {
             }
             else {
                 int currentLevelIndex = intent.getIntExtra(ActivityUtility.currentLevelID, -1);
+
                 if (!intent.getBooleanExtra(ActivityUtility.soundID, false)) {
                     toggleSound();
                 }
@@ -141,6 +141,24 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        releaseSound();
+    }
+
+    /**
+     * Called when the activity is closed.
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences preferences = this.getPreferences(0);
+
+        releaseSound();
+    }
+
+    /**
+     * Stops and releases sound.
+     */
+    private void releaseSound() {
         if (actionSoundPlayer != null) {
             actionSoundPlayer.release();
         }
@@ -148,8 +166,6 @@ public class PlayActivity extends AppCompatActivity {
         if (successSoundPlayer != null) {
             successSoundPlayer.release();
         }
-
-
     }
 
     /**
@@ -265,7 +281,9 @@ public class PlayActivity extends AppCompatActivity {
             canUndo = false;
 
             TextView message = findViewById(R.id.message);
-            message.setText(levelManager.getCurrentLevel().getMessage());
+            String levelMessage = levelManager.getCurrentLevel().getMessage();
+            message.setText(levelMessage);
+            message.setContentDescription(levelMessage);
         }
         catch (LevelLoadException e) {
             ActivityUtility.showAlert("Level Load Error", "There was an error " +
@@ -387,18 +405,9 @@ public class PlayActivity extends AppCompatActivity {
         ImageButton soundButton = findViewById(R.id.soundButton);
         if (soundOn) {
             soundButton.setImageResource(R.drawable.sound_off_icon);
-            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (audioManager != null) {
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-            }
-
         }
         else {
             soundButton.setImageResource(R.drawable.sound_on_icon);
-            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (audioManager != null) {
-                audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-            }
         }
         soundOn = !soundOn;
     }
